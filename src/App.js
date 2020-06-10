@@ -3,6 +3,8 @@ import './App.css';
 import Wall from './components/wall';
 import Button from './components/button';
 import Hand from './components/hand';
+import ClearFloat from './components/clearFloat';
+import MessageList from './components/messageList';
 
 class App extends Component {
   state = {
@@ -11,7 +13,10 @@ class App extends Component {
     player2: [],
     player3: [],
     player4: [],
-    discardPile: []
+    discardPile: [],
+    turn: 0,
+    messages: [],
+    hasDrawnTile: true
   }
 
   // 144 tiles
@@ -197,8 +202,19 @@ class App extends Component {
     { type: "season", label: "Season 4", code: "sea4", img: "" }
   ];
 
-  componentDidMount() {
-    this.setNewGame();
+  async componentDidMount() {
+    await this.setNewGame();
+
+    this.givePlayersTiles();
+
+    this.tileCountVerification();
+  }
+
+  tileCountVerification = () => {
+    const { tiles, player1, player2, player3, player4, discardPile } = this.state;
+    let totalTiles = tiles.length + player1.length + player2.length + player3.length + player4.length + discardPile.length;
+    console.log(`Total Tiles: ${totalTiles}`);
+    (totalTiles !== 144) && console.log("Total tiles is not what it should be.");
   }
 
   // https://medium.com/@nitinpatel_20236/how-to-shuffle-correctly-shuffle-an-array-in-javascript-15ea3f84bfb
@@ -214,6 +230,7 @@ class App extends Component {
   }
 
   handleShuffle = () => {
+    this.outputMessage("Shuffled.");
     let tiles = this.shuffle([...this.state.tiles]);
 
     this.setState({ tiles });
@@ -222,10 +239,11 @@ class App extends Component {
   getTileChunk = (tiles, player, index, amount) => {
     let grabbedTiles = [];
     grabbedTiles = tiles.splice(index, amount);
+
     return player.concat(grabbedTiles);
   }
 
-  handleAction = () => {
+  givePlayersTiles = () => {
     let tiles = [...this.state.tiles];
     let player1 = [...this.state.player1];
     let player2 = [...this.state.player2];
@@ -254,12 +272,17 @@ class App extends Component {
     player3 = this.getTileChunk(tiles, player3, 0, 1);
     player4 = this.getTileChunk(tiles, player4, 0, 1);
 
-    this.setState({ tiles, player1, player2, player3, player4 });
+    let turn = 1;
+    this.outputMessage(`Waiting for player ${turn}...`);
+
+    this.setState({ tiles, player1, player2, player3, player4, turn });
   }
 
-  setNewGame = () => {
+  setNewGame = (message = "New game set.") => {
+    this.outputMessage(message);
+
     let tiles = [...this.tiles];
-    // tiles = this.shuffle(tiles);
+    tiles = this.shuffle(tiles);
 
     this.setState({
       tiles,
@@ -267,47 +290,91 @@ class App extends Component {
       player2: [],
       player3: [],
       player4: [],
-      discardPile: []
+      discardPile: [],
+      turn: 0,
+      hasDrawnTile: true
     });
   }
 
-  handleReset = () => {
-    this.setNewGame();
+  handleReset = async () => {
+    await this.setNewGame("Game resetted.");
+
+    // Give tiles to all players
+    this.givePlayersTiles();
   }
 
-  discardTile = (tileCode) => {
-    let player1 = [...this.state.player1];
+  outputMessage = (message) => {
+    let messages = [...this.state.messages];
+    messages.push(message);
+
+    this.setState({ messages });
+  }
+
+  handleDrawTile = () => {
+    let tiles = [...this.state.tiles];
+    let hasDrawnTile = this.state.hasDrawnTile;
+    hasDrawnTile = !hasDrawnTile;
+
+    // Remove and assign tile from wall to variable
+    let grabbedTile = tiles.shift();
+    let turn = this.state.turn;
+    let currentPlayer = "player" + turn;
+    let currentPlayerHand = [...this.state[currentPlayer]];
+
+    // Put removed tile in player's hand
+    currentPlayerHand.push(grabbedTile);
+
+    this.setState({ tiles, [currentPlayer]: currentPlayerHand, hasDrawnTile });
+  }
+
+  handleClearMessages = () => {
+    this.setState({ messages: ["Messages cleared."] });
+  }
+
+  discardTile = (tileCode, playerNum) => {
+    let player = [...this.state[playerNum]];
     let discardPile = [...this.state.discardPile];
+    let turn = this.state.turn;
+    let hasDrawnTile = this.state.hasDrawnTile;
+    hasDrawnTile = !hasDrawnTile;
 
     // Get tile to be removed and place in discard pile.
-    let discardingTile = player1.filter(tile => {
-      return (
-        tile.code === tileCode
-      )
+    let discardingTile = player.filter(tile => {
+      return tile.code === tileCode
+    })[0];
+    discardPile.push(discardingTile);
+
+    // Set new hand with tile removed
+    player = player.filter(tile => {
+      return tile.code !== tileCode
     });
 
-    discardPile.push(discardingTile[0]);
+    turn = (turn === 4) ? (1) : (turn + 1);
+    this.outputMessage(`Waiting for player ${turn}...`);
 
-    // Remove tile from hand
-    player1 = player1.filter(tile => {
-      return (
-        tile.code !== tileCode
-      )
-    });
-
-    this.setState({ player1, discardPile });
+    this.setState({ [playerNum]: player, discardPile, turn, hasDrawnTile });
   }
 
   render() {
-    const { tiles, player1, player2, player3, player4, discardPile } = this.state;
+    const {
+      tiles,
+      player1,
+      player2,
+      player3,
+      player4,
+      discardPile,
+      turn,
+      messages,
+      hasDrawnTile
+    } = this.state;
 
     return (
       <React.Fragment>
-        {/* <h1>Hong Kong Mahjong</h1> */}
         <div>
           <Button name="shuffle" label="Shuffle" onClick={this.handleShuffle} />
-          <Button name="action" label="Action" onClick={this.handleAction} />
+          <Button name="clearMessages" label="Clear Messages" onClick={this.handleClearMessages} />
           <Button name="reset" label="Reset" onClick={this.handleReset} />
+          {tiles.length}
         </div>
 
         <Wall tiles={tiles} end={18} />
@@ -318,16 +385,16 @@ class App extends Component {
         <Wall tiles={tiles} end={108} />
         <Wall tiles={tiles} end={126} />
         <Wall tiles={tiles} end={145} />
+        <ClearFloat />
 
-        <div style={{ clear: "both" }}></div>
+        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
+        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
+        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
+        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
 
-        <Hand player={player1} onClick={this.discardTile} />
-        <Hand player={player2} onClick={this.discardTile} />
-        <Hand player={player3} onClick={this.discardTile} />
-        <Hand player={player4} onClick={this.discardTile} />
+        <Hand player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" />
 
-        <Hand player={discardPile} bgColor="lightcoral" />
-        {/* <Hand player={discardPile} onClick={this.discardTile} /> */}
+        <MessageList messages={messages} />
       </React.Fragment>
     );
   }
