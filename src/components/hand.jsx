@@ -1,6 +1,15 @@
 import React from 'react';
 import Button from './button';
 
+const sortTilesInHand = (a, b) => {
+  const nameA = a.code.substring(0, 5).toUpperCase();
+  const nameB = b.code.substring(0, 5).toUpperCase();
+  if (nameA < nameB) return -1;
+  if (nameA > nameB) return 1;
+
+  return 0; // names must be equal
+}
+
 const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile }) => {
   let disabled = true;
   let playerTurn = parseInt(playerNum.slice(-1));
@@ -18,6 +27,8 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
     }
 
     disableDrawTileBtn = (player.length >= 14) ? true : false;
+
+    player.sort((a, b) => sortTilesInHand(a, b));
   } else {
     disabled = true;
     disableDrawTileBtn = true;
