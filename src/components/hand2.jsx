@@ -10,7 +10,7 @@ const sortTilesInHand = (a, b) => {
   return 0; // names must be equal
 }
 
-const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile }) => {
+const Hand2 = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile }) => {
   let disabled = true;
   let playerTurn = parseInt(playerNum.slice(-1));
   let disableDrawTileBtn = null;
@@ -26,9 +26,9 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
       disableDrawTileBtn = true;
     }
 
-    disableDrawTileBtn = (player.length >= 14) ? true : false;
+    disableDrawTileBtn = (player.main.length >= 14) ? true : false;
 
-    player.sort(sortTilesInHand);
+    player.main.sort(sortTilesInHand);
   } else {
     disabled = true;
     disableDrawTileBtn = true;
@@ -41,9 +41,9 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
       <div style={{ paddingBottom: "16px" }}>
         {playerNum}
         <Button name="drawTile" label="Draw Tile" onClick={handleDrawTile} disableDrawTileBtn={disableDrawTileBtn} />
-        {player.length}
+        {player.main.length}
       </div>
-      {player.map((tile, index) => {
+      {player.main.map((tile, index) => {
         return (
           <button
             key={index}
@@ -60,4 +60,4 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
   );
 }
 
-export default Hand;
+export default Hand2;
