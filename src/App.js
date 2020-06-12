@@ -3,24 +3,17 @@ import './App.css';
 import Wall from './components/wall';
 import Button from './components/button';
 import Hand from './components/hand';
-import Hand2 from './components/hand2';
 import ClearFloat from './components/clearFloat';
 import MessageList from './components/messageList';
 
 class App extends Component {
   state = {
     tiles: [],
-    player5: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-    // player1: [],
-    player1: { main: ["s"], newTile: {}, flowers: [], chowPungKong: [] },
+    player1: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
     player2: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-    player3: [],
-    player4: [],
-    discardPile: [],
-    discardPile2: {
-      main: [],
-      recentDiscard: []
-    },
+    player3: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+    player4: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+    discardPile: { main: [], recentDiscard: {} },
     turn: 0,
     messages: [],
     hasDrawnTile: true
@@ -219,7 +212,7 @@ class App extends Component {
 
   tileCountVerification = () => {
     const { tiles, player1, player2, player3, player4, discardPile } = this.state;
-    let totalTiles = tiles.length + player1.length + player2.length + player3.length + player4.length + discardPile.length;
+    let totalTiles = tiles.length + player1.main.length + player2.main.length + player3.main.length + player4.main.length + discardPile.main.length;
     console.log(`Total Tiles: ${totalTiles}`);
     (totalTiles !== 144) && console.log("Total tiles is not what it should be.");
   }
@@ -252,40 +245,37 @@ class App extends Component {
 
   givePlayersTiles = () => {
     let tiles = [...this.state.tiles];
-    let player1 = { ...this.state.player1 };
-    let player2 = [...this.state.player2];
-    let player3 = [...this.state.player3];
-    let player4 = [...this.state.player4];
-    let player5 = { ...this.state.player5 };
-    console.log(player1);
+    let player1 = {...this.state.player1};
+    let player2 = {...this.state.player2};
+    let player3 = {...this.state.player3};
+    let player4 = {...this.state.player4};
 
     player1.main = this.getTileChunk(tiles, player1.main, 0, 4);
     player2.main = this.getTileChunk(tiles, player2.main, 0, 4);
-    player3 = this.getTileChunk(tiles, player3, 0, 4);
-    player4 = this.getTileChunk(tiles, player4, 0, 4);
-    player5.main = this.getTileChunk(tiles, player5.main, 0, 4);
+    player3.main = this.getTileChunk(tiles, player3.main, 0, 4);
+    player4.main = this.getTileChunk(tiles, player4.main, 0, 4);
 
     player1.main = this.getTileChunk(tiles, player1.main, 0, 4);
     player2.main = this.getTileChunk(tiles, player2.main, 0, 4);
-    player3 = this.getTileChunk(tiles, player3, 0, 4);
-    player4 = this.getTileChunk(tiles, player4, 0, 4);
+    player3.main = this.getTileChunk(tiles, player3.main, 0, 4);
+    player4.main = this.getTileChunk(tiles, player4.main, 0, 4);
 
     player1.main = this.getTileChunk(tiles, player1.main, 0, 4);
     player2.main = this.getTileChunk(tiles, player2.main, 0, 4);
-    player3 = this.getTileChunk(tiles, player3, 0, 4);
-    player4 = this.getTileChunk(tiles, player4, 0, 4);
+    player3.main = this.getTileChunk(tiles, player3.main, 0, 4);
+    player4.main = this.getTileChunk(tiles, player4.main, 0, 4);
 
     // Jump tiles
     player1.main = this.getTileChunk(tiles, player1.main, 0, 1);
     player1.main = this.getTileChunk(tiles, player1.main, 3, 1);
     player2.main = this.getTileChunk(tiles, player2.main, 0, 1);
-    player3 = this.getTileChunk(tiles, player3, 0, 1);
-    player4 = this.getTileChunk(tiles, player4, 0, 1);
+    player3.main = this.getTileChunk(tiles, player3.main, 0, 1);
+    player4.main = this.getTileChunk(tiles, player4.main, 0, 1);
 
     let turn = 1;
     this.outputMessage(`Waiting for player ${turn}...`);
 
-    this.setState({ tiles, player1, player2, player3, player4, player5, turn });
+    this.setState({ tiles, player1, player2, player3, player4, turn });
   }
 
   setNewGame = (message = "New game set.") => {
@@ -298,9 +288,12 @@ class App extends Component {
       tiles,
       player1: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
       player2: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-      player3: [],
-      player4: [],
-      discardPile: [],
+      player3: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+      player4: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+      discardPile: {
+        main: [],
+        recentDiscard: []
+      },
       turn: 0,
       hasDrawnTile: true
     });
@@ -329,11 +322,11 @@ class App extends Component {
     let grabbedTile = tiles.shift();
     let turn = this.state.turn;
     let currentPlayer = "player" + turn;
-    let currentPlayerHand = [...this.state[currentPlayer]];
+    let currentPlayerHand = {...this.state[currentPlayer]};
 
     // Put removed tile in player's hand
-    currentPlayerHand.push(grabbedTile);
-
+    currentPlayerHand.newTile = grabbedTile;
+console.log(`hasDrawnTile: ${hasDrawnTile}`)
     this.setState({ tiles, [currentPlayer]: currentPlayerHand, hasDrawnTile });
   }
 
@@ -341,27 +334,32 @@ class App extends Component {
     this.setState({ messages: ["Messages cleared."] });
   }
 
-  discardTile = (tileCode, playerNum) => {
-    let player = [...this.state[playerNum]];
-    let discardPile = [...this.state.discardPile];
+  discardTile = (tileCode, playerNum, newTile=false) => {
+    let player = {...this.state[playerNum]};
+    let discardPile = {...this.state.discardPile};
     let turn = this.state.turn;
     let hasDrawnTile = this.state.hasDrawnTile;
     hasDrawnTile = !hasDrawnTile;
 
+    let playerHand = (newTile) ? player.newTile : player.main;
+
     // Get tile to be removed and place in discard pile.
-    let discardingTile = player.filter(tile => {
+    let discardingTile = playerHand.filter(tile => {
       return tile.code === tileCode
     })[0];
-    discardPile.push(discardingTile);
+    discardPile.recentDiscard = discardingTile;
 
     // Set new hand with tile removed
-    player = player.filter(tile => {
+    let playerMain = playerHand.filter(tile => {
       return tile.code !== tileCode
     });
+
+    player.main = playerMain;
 
     turn = (turn === 4) ? (1) : (turn + 1);
     this.outputMessage(`Waiting for player ${turn}...`);
 
+    // return;
     this.setState({ [playerNum]: player, discardPile, turn, hasDrawnTile });
   }
 
@@ -372,7 +370,6 @@ class App extends Component {
       player2,
       player3,
       player4,
-      player5,
       discardPile,
       turn,
       messages,
@@ -398,14 +395,12 @@ class App extends Component {
         <Wall tiles={tiles} end={145} />
         <ClearFloat />
 
-        <Hand2 player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
-        <Hand2 player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
+        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
+        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
         <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
         <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
 
-        <Hand2 player={player5} onClick={this.discardTile} turn={turn} playerNum="player5" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
-
-        <Hand player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" />
+        <Hand player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} />
 
         <MessageList messages={messages} />
       </React.Fragment>
