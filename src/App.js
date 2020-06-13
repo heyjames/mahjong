@@ -3,6 +3,7 @@ import './App.css';
 import Wall from './components/wall';
 import Button from './components/button';
 import Hand from './components/hand';
+import Discard from './components/discard';
 import ClearFloat from './components/clearFloat';
 import MessageList from './components/messageList';
 
@@ -245,10 +246,10 @@ class App extends Component {
 
   givePlayersTiles = () => {
     let tiles = [...this.state.tiles];
-    let player1 = {...this.state.player1};
-    let player2 = {...this.state.player2};
-    let player3 = {...this.state.player3};
-    let player4 = {...this.state.player4};
+    let player1 = { ...this.state.player1 };
+    let player2 = { ...this.state.player2 };
+    let player3 = { ...this.state.player3 };
+    let player4 = { ...this.state.player4 };
 
     player1.main = this.getTileChunk(tiles, player1.main, 0, 4);
     player2.main = this.getTileChunk(tiles, player2.main, 0, 4);
@@ -322,11 +323,14 @@ class App extends Component {
     let grabbedTile = tiles.shift();
     let turn = this.state.turn;
     let currentPlayer = "player" + turn;
-    let currentPlayerHand = {...this.state[currentPlayer]};
+    let currentPlayerHand = { ...this.state[currentPlayer] };
 
-    // Put removed tile in player's hand
+    // Define the player's latest tile
     currentPlayerHand.newTile = grabbedTile;
-console.log(`hasDrawnTile: ${hasDrawnTile}`)
+    currentPlayerHand.main.push(grabbedTile);
+
+    // console.log(`hasDrawnTile: ${hasDrawnTile}`);
+
     this.setState({ tiles, [currentPlayer]: currentPlayerHand, hasDrawnTile });
   }
 
@@ -334,27 +338,31 @@ console.log(`hasDrawnTile: ${hasDrawnTile}`)
     this.setState({ messages: ["Messages cleared."] });
   }
 
-  discardTile = (tileCode, playerNum, newTile=false) => {
-    let player = {...this.state[playerNum]};
-    let discardPile = {...this.state.discardPile};
+  discardTile = (tileCode, playerNum, newTile = false) => {
+    let player = { ...this.state[playerNum] };
+    let discardPile = { ...this.state.discardPile };
     let turn = this.state.turn;
     let hasDrawnTile = this.state.hasDrawnTile;
     hasDrawnTile = !hasDrawnTile;
 
-    let playerHand = (newTile) ? player.newTile : player.main;
+    // let playerHand = (newTile) ? player.newTile : player.main;
 
     // Get tile to be removed and place in discard pile.
-    let discardingTile = playerHand.filter(tile => {
+    let discardingTile = player.main.filter(tile => {
       return tile.code === tileCode
     })[0];
     discardPile.recentDiscard = discardingTile;
+    discardPile.main.push(discardingTile);
 
     // Set new hand with tile removed
-    let playerMain = playerHand.filter(tile => {
+    player.main = player.main.filter(tile => {
       return tile.code !== tileCode
     });
 
-    player.main = playerMain;
+    // Empty newTile if discarding it
+    if (player.newTile.code === discardingTile.code) {
+      player.newTile = {};
+    }
 
     turn = (turn === 4) ? (1) : (turn + 1);
     this.outputMessage(`Waiting for player ${turn}...`);
@@ -400,7 +408,7 @@ console.log(`hasDrawnTile: ${hasDrawnTile}`)
         <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
         <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} />
 
-        <Hand player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} />
+        <Discard player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} />
 
         <MessageList messages={messages} />
       </React.Fragment>

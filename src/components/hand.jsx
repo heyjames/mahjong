@@ -1,6 +1,6 @@
 import React from 'react';
-import Button from './button';
-import _ from 'lodash';
+// import Button from './button';
+// import _ from 'lodash';
 
 const sortTilesInHand = (a, b) => {
   const nameA = a.code.substring(0, 5).toUpperCase();
@@ -11,28 +11,27 @@ const sortTilesInHand = (a, b) => {
   return 0; // names must be equal
 }
 
-const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile, discard=false }) => {
-  let disabled = true;
+const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile }) => {
+  let disableDiscardTileBtn = true;
   let playerTurn = parseInt(playerNum.slice(-1));
   let disableDrawTileBtn = null;
 
   if (playerTurn === turn) {
-    disabled = false;
+    disableDiscardTileBtn = false;
 
     if (hasDrawnTile === false) {
-      disabled = true;
+      disableDiscardTileBtn = true;
       disableDrawTileBtn = false;
     } else {
-      disabled = false;
+      disableDiscardTileBtn = false;
       disableDrawTileBtn = true;
-      console.log("Fired!");
     }
 
     disableDrawTileBtn = (player.main.length >= 14) ? true : false;
 
     player.main.sort(sortTilesInHand);
   } else {
-    disabled = true;
+    disableDiscardTileBtn = true;
     disableDrawTileBtn = true;
   }
 
@@ -42,32 +41,28 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
     <span style={{ float: "left", width: "160px", backgroundColor: highlightPlayerTurn }}>
       <div style={{ paddingBottom: "16px" }}>
         {playerNum}
-        <Button name="drawTile" label="Draw Tile" onClick={handleDrawTile} disableDrawTileBtn={disableDrawTileBtn} />
+        {/* <Button name="drawTile" label="Draw Tile" onClick={handleDrawTile} disableDrawTileBtn={disableDrawTileBtn} /> */}
+        <button name="drawTile" onClick={handleDrawTile} disabled={disableDrawTileBtn}>
+          Draw Tile
+        </button>
         Tiles in Hand: {player.main.length}
       </div>
       {player.main.map((tile, index) => {
+        bgColor = (tile.code === player.newTile.code) ? "lightseagreen" : "lightblue";
+
         return (
           <button
             key={index}
             name={playerNum}
-            style={{ backgroundColor: bgColor, marginBottom: "2px", width: "120px", color }}
+            style={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px", color }}
             onClick={() => onClick(tile.code, playerNum)}
-            disabled={disabled}
+            disabled={disableDiscardTileBtn}
           >
             {tile.label}
           </button>
         )
       })}
-      
-      {player.newTile && <button
-            name={playerNum}
-            style={{ backgroundColor: "lightseagreen", marginBottom: "2px", width: "120px", color }}
-            onClick={() => onClick(player.newTile.code, playerNum)}
-            disabled={disabled}
-          >
-            {player.newTile.label}
-          </button>}
-      {discard && <button name={playerNum} style={{ backgroundColor: bgColor, marginBottom: "2px", width: "120px", color }} disabled={disabled}>{player.recentDiscard.label}</button>}
+
     </span>
   );
 }
