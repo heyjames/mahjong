@@ -50,8 +50,8 @@ const Discard = ({
       });
       if (rightJoinChow1) rightJoinChow.push(rightJoinChow1);
       if (rightJoinChow2) rightJoinChow.push(rightJoinChow2);
-      console.log(rightJoinChow);
-      console.log(rightJoinChow.length);
+      // console.log(rightJoinChow);
+      // console.log(rightJoinChow.length);
 
       if (rightJoinChow.length === 2) disableChowButton = false;
 
@@ -75,11 +75,10 @@ const Discard = ({
       });
       if (leftJoinChow1) leftJoinChow.push(leftJoinChow1);
       if (leftJoinChow2) leftJoinChow.push(leftJoinChow2);
-      console.log(leftJoinChow);
-      console.log(leftJoinChow.length);
+      // console.log(leftJoinChow);
+      // console.log(leftJoinChow.length);
 
       if (leftJoinChow.length === 2) disableChowButton = false;
-      if (rightJoinChow.length === 2) disableChowButton = false;
 
 
 
@@ -101,8 +100,8 @@ const Discard = ({
       });
       if (middleJoinChow1) middleJoinChow.push(middleJoinChow1);
       if (middleJoinChow2) middleJoinChow.push(middleJoinChow2);
-      console.log(middleJoinChow);
-      console.log(middleJoinChow.length);
+      // console.log(middleJoinChow);
+      // console.log(middleJoinChow.length);
 
       if (middleJoinChow.length === 2) disableChowButton = false;
 
@@ -138,8 +137,8 @@ const Discard = ({
         return (
           <React.Fragment key={index}>
             <button style={{ backgroundColor: discardBgColor, width: "130px" }}>{tile.label}</button>
-            {tile.code === player.recentDiscard.code && <button key={"a" + index} style={{ backgroundColor: discardBgColor, width: "24px" }} onClick={() => handleChow(tile.code)} disabled={disableChowButton}>C</button>}
-            {tile.code === player.recentDiscard.code && <button key={"b" + index} style={{ backgroundColor: discardBgColor, width: "24px" }} onClick={() => handlePung(tile.code)} disabled={disablePungButton}>P</button>}
+            {/* {tile.code === player.recentDiscard.code && <button key={"a" + index} style={{ backgroundColor: discardBgColor, width: "24px" }} onClick={() => handleChow(tile.code)} disabled={disableChowButton}>C</button>}
+            {tile.code === player.recentDiscard.code && <button key={"b" + index} style={{ backgroundColor: discardBgColor, width: "24px" }} onClick={() => handlePung(tile.code)} disabled={disablePungButton}>P</button>} */}
           </React.Fragment>
         )
       })}

@@ -409,7 +409,7 @@ class App extends Component {
     this.setState({ [playerNum]: player, discardPile, turn, hasDrawnTile });
   }
 
-  handleChow = (tileCode) => {
+  handleChow = () => {
     // Remove tileCode from discard pile
     let discardPile = { ...this.state.discardPile };
     let lastDiscardTile = discardPile.recentDiscard;
@@ -433,7 +433,9 @@ class App extends Component {
     this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, disableDiscardButton });
   }
 
-  handlePung = () => {
+  handlePung = (turn) => {
+    console.log(turn);
+
     // Remove tileCode from discard pile
     let discardPile = { ...this.state.discardPile };
     let lastDiscardTile = discardPile.recentDiscard;
@@ -443,7 +445,7 @@ class App extends Component {
     discardPile.recentDiscard = {};
 
     // Put the discarded tile into the current player's hand
-    let currentPlayer = this.state["player" + this.state.turn];
+    let currentPlayer = this.state["player" + turn];
     currentPlayer.main.push(lastDiscardTile);
 
     // Disable the Draw Tile button
@@ -454,7 +456,7 @@ class App extends Component {
     currentPlayer.newTile = lastDiscardTile;
 
     // Set new state
-    this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, disableDiscardButton });
+    this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, turn, disableDiscardButton });
   }
 
   render() {
@@ -493,10 +495,10 @@ class App extends Component {
         <Wall tiles={tiles} end={145} />
         <ClearFloat />
 
-        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} />
-        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} />
-        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} />
-        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} />
+        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
+        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
+        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
+        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
 
         <Discard player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} disableChowButton={disableChowButton} disablePungButton={disablePungButton} handleChow={this.handleChow} handlePung={this.handlePung} discardPile={discardPile} state={this.state} />
 
