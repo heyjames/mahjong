@@ -11,19 +11,16 @@ const sortTilesInHand = (a, b) => {
   return 0; // names must be equal
 }
 
-const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile }) => {
-  let disableDiscardTileBtn = true;
+const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, color, handleDrawTile, hasDrawnTile, disableDiscardButton }) => {
+
   let playerTurn = parseInt(playerNum.slice(-1));
   let disableDrawTileBtn = null;
 
   if (playerTurn === turn) {
-    disableDiscardTileBtn = false;
-
     if (hasDrawnTile === false) {
-      disableDiscardTileBtn = true;
+
       disableDrawTileBtn = false;
     } else {
-      disableDiscardTileBtn = false;
       disableDrawTileBtn = true;
     }
 
@@ -31,7 +28,7 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
 
     player.main.sort(sortTilesInHand);
   } else {
-    disableDiscardTileBtn = true;
+    disableDiscardButton = true;
     disableDrawTileBtn = true;
   }
 
@@ -56,7 +53,7 @@ const Hand = ({ player, onClick = null, playerNum, bgColor = "lightblue", turn, 
             name={playerNum}
             style={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px", color }}
             onClick={() => onClick(tile.code, playerNum)}
-            disabled={disableDiscardTileBtn}
+            disabled={disableDiscardButton}
           >
             {tile.label}
           </button>
