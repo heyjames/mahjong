@@ -27,7 +27,9 @@ const Hand = ({
   discardPile,
   handleChowLeft,
   handleChowMiddle,
-  handleChowRight
+  handleChowRight,
+  disableKongButton,
+  handleKong
 }) => {
   let playerTurn = parseInt(playerNum.slice(-1));
   let disableDrawTileBtn = null;
@@ -50,11 +52,13 @@ const Hand = ({
   let highlightPlayerTurn = (playerTurn === turn) ? "lightgreen" : null;
 
   let pungBgColor = null;
+  let kongBgColor = null;
   let chowBgColor = null;
 
 
   const recentDiscardCode = _.get(discardPile, "recentDiscard.code");
   let pung = [];
+  let kong = [];
   const rightJoinChow = [];
   const leftJoinChow = [];
   const middleJoinChow = [];
@@ -125,19 +129,19 @@ const Hand = ({
     const middleJoinChow2 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + right)
     });
-    if (playerTurn === turn) console.log(middleJoinChow1);
-    if (playerTurn === turn) console.log(middleJoinChow2);
+    // if (playerTurn === turn) console.log(middleJoinChow1);
+    // if (playerTurn === turn) console.log(middleJoinChow2);
 
     if (playerTurn === turn) {
       if (middleJoinChow1) {
         middleJoinChow.push(middleJoinChow1);
-        console.log("what?");
+        // console.log("what?");
       }
       if (middleJoinChow2) {
         middleJoinChow.push(middleJoinChow2);
-        console.log("Chicken?");
+        // console.log("Chicken?");
       }
-      console.log(middleJoinChow);
+      // console.log(middleJoinChow);
     }
 
     if (playerTurn === turn && middleJoinChow.length === 2) {
@@ -174,27 +178,35 @@ const Hand = ({
       disablePungButton = false;
       pungBgColor = "red";
     }
+
+
+    kong = player.main.filter(tile => {
+      return tile.code.includes(prefix + tileIndex)
+    });
+    console.log('kong: ');
+    console.log(kong);
+
+    if (kong.length === 3) {
+      disableKongButton = false;
+      kongBgColor = "red";
+    }
   }
 
   if (playerTurn === turn) {
     if (hasDrawnTile) {
-      // console.log(disablePungButton);
       disablePungButton = true;
+      disableKongButton = true;
       pungBgColor = null;
+      kongBgColor = null;
     }
   }
 
-  // console.log(discardPile.recentDiscard.prevOwner); // result: player1
-  // console.log(playerNum);
   if (discardPile.recentDiscard.prevOwner === playerNum) {
     disablePungButton = true;
+    disableKongButton = true;
     pungBgColor = null;
+    kongBgColor = null;
   }
-  // if (discardPile.recentDiscard && discardPile.recentDiscard.prevOwner === 1) {
-  //   disablePungButton = true;
-  // }
-
-  // console.log(`hasDrawnTile hasDrawnTile hasDrawnTile: ${hasDrawnTile}`);
 
   let chowCount = 0;
   let oneChow = [];
@@ -202,7 +214,7 @@ const Hand = ({
   if (rightJoinChow.length > 1) chowCount = chowCount + 1;
   if (leftJoinChow.length > 1) chowCount = chowCount + 1;
   if (middleJoinChow.length > 1) chowCount = chowCount + 1;
-  if (playerTurn === turn) console.log(chowCount);
+  // if (playerTurn === turn) console.log(chowCount);
   if (chowCount === 1) {
     if (rightJoinChow.length > 1) oneChow = [...rightJoinChow];
     if (leftJoinChow.length > 1) oneChow = [...leftJoinChow];
@@ -212,9 +224,9 @@ const Hand = ({
 
 
   if (playerTurn === turn) {
-    console.log(chowCount);
-    console.log(rightJoinChow);
-    console.log(discardPile.recentDiscard.code);
+    // console.log(chowCount);
+    // console.log(rightJoinChow);
+    // console.log(discardPile.recentDiscard.code);
   }
 
   return (
@@ -228,6 +240,9 @@ const Hand = ({
 
         <button name="pung" style={{ backgroundColor: pungBgColor }} onClick={() => handlePung(playerTurn, pung)} disabled={disablePungButton}>
           Pung
+        </button>
+        <button name="kong" style={{ backgroundColor: kongBgColor }} onClick={() => handleKong(playerTurn, kong)} disabled={disableKongButton}>
+          Kong
         </button>
         {(rightJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowRight(rightJoinChow)} disabled={disableChowButton}>R-Chow</button>}
         {(leftJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowLeft(leftJoinChow)} disabled={disableChowButton}>L-Chow</button>}

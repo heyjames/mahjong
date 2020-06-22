@@ -22,7 +22,8 @@ class App extends Component {
     hasDrawnTile: true,
     disableDiscardButton: true,
     disableChowButton: true,
-    disablePungButton: true
+    disablePungButton: true,
+    disableKongButton: true
   }
 
   // 144 tiles
@@ -547,6 +548,56 @@ class App extends Component {
     this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, disableDiscardButton });
   }
 
+  handleKong = (turn, kong) => {
+
+    // Remove tileCode from discard pile
+    let discardPile = { ...this.state.discardPile };
+    let lastDiscardTile = discardPile.recentDiscard;
+    // console.log(turn);
+    // console.log(pung);
+    // console.log(lastDiscardTile);
+    discardPile.main.pop();
+
+    // Set the last discarded tile to become empty
+    discardPile.recentDiscard = {};
+
+    // Put the discarded tile into the current player's hand
+    let currentPlayer = this.state["player" + turn];
+    currentPlayer.main.push(lastDiscardTile);
+
+    // Disable the Draw Tile button
+    let hasDrawnTile = true;
+    let disableDiscardButton = false;
+
+    // Set player.newTile object to the one obtained from chow
+    currentPlayer.newTile = lastDiscardTile;
+
+    currentPlayer.chowPungKong.push(kong[0]);
+    currentPlayer.chowPungKong.push(kong[1]);
+    currentPlayer.chowPungKong.push(kong[2]);
+    currentPlayer.chowPungKong.push(lastDiscardTile);
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== kong[0].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== kong[1].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== kong[2].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== lastDiscardTile.code)
+    });
+    currentPlayer.chowPungKong.sort(this.sortTilesInHand);
+    // console.log("currentPlayer.main: ");
+    // console.log(currentPlayer.main);
+    // console.log("currentPlayer.chowPungKong: ");
+    // console.log(currentPlayer.chowPungKong);
+
+    // Set new state
+    this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, turn, disableDiscardButton });
+  }
+
   handlePung = (turn, pung) => {
     // Remove tileCode from discard pile
     let discardPile = { ...this.state.discardPile };
@@ -605,7 +656,7 @@ class App extends Component {
       hasDrawnTile,
       disableDiscardButton
     } = this.state;
-    let { disableChowButton, disablePungButton } = this.state;
+    let { disableChowButton, disablePungButton, disableKongButton } = this.state;
 
     // console.log(player2);
 
@@ -628,10 +679,10 @@ class App extends Component {
         <Wall tiles={tiles} end={145} />
         <ClearFloat />
 
-        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
-        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
-        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
-        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
+        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} handleKong={this.handleKong} disableKongButton={disableKongButton} />
+        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} handleKong={this.handleKong} disableKongButton={disableKongButton} />
+        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} handleKong={this.handleKong} disableKongButton={disableKongButton} />
+        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} handleKong={this.handleKong} disableKongButton={disableKongButton} />
 
         <Discard player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} disableChowButton={disableChowButton} disablePungButton={disablePungButton} handleChow={this.handleChowLeft} handlePung={this.handlePung} discardPile={discardPile} state={this.state} />
 
