@@ -354,7 +354,8 @@ class App extends Component {
   handleDrawTile = () => {
     let tiles = [...this.state.tiles];
     let hasDrawnTile = this.state.hasDrawnTile;
-    hasDrawnTile = !hasDrawnTile;
+
+    hasDrawnTile = true;
 
     // Remove and assign tile from wall to variable
     let grabbedTile = tiles.shift();
@@ -368,8 +369,10 @@ class App extends Component {
 
     // console.log(`hasDrawnTile: ${hasDrawnTile}`);
     let disableDiscardButton = false;
+    let disablePungButton = true;
 
-    this.setState({ tiles, [currentPlayer]: currentPlayerHand, hasDrawnTile, disableDiscardButton });
+
+    this.setState({ tiles, [currentPlayer]: currentPlayerHand, hasDrawnTile, disableDiscardButton, disablePungButton });
   }
 
   handleClearMessages = () => {
@@ -381,7 +384,7 @@ class App extends Component {
     let discardPile = { ...this.state.discardPile };
     let turn = this.state.turn;
     let hasDrawnTile = this.state.hasDrawnTile;
-    hasDrawnTile = !hasDrawnTile;
+    hasDrawnTile = false;
 
     // let playerHand = (newTile) ? player.newTile : player.main;
 
@@ -402,18 +405,24 @@ class App extends Component {
       player.newTile = {};
     }
 
+    discardPile.recentDiscard.prevOwner = "player" + turn;
+
     turn = (turn === 4) ? (1) : (turn + 1);
     this.outputMessage(`Waiting for player ${turn}...`);
+
 
     // return;
     this.setState({ [playerNum]: player, discardPile, turn, hasDrawnTile });
   }
 
-  handleChow = () => {
+  handleChowLeft = (oneChow) => {
     // Remove tileCode from discard pile
     let discardPile = { ...this.state.discardPile };
     let lastDiscardTile = discardPile.recentDiscard;
     discardPile.main.pop();
+
+    // console.log("oneChow: ");
+    // console.log(oneChow);
 
     // Set the last discarded tile to become empty
     discardPile.recentDiscard = {};
@@ -423,22 +432,128 @@ class App extends Component {
     currentPlayer.main.push(lastDiscardTile);
 
     // Disable the Draw Tile button
-    let hasDrawnTile = false;
+    let hasDrawnTile = true;
     let disableDiscardButton = false;
 
     // Set player.newTile object to the one obtained from chow
     currentPlayer.newTile = lastDiscardTile;
 
+    // console.log("oneChow: oneChow: oneChow: ");
+    // console.log(oneChow);
+    // console.log(lastDiscardTile);
+    currentPlayer.chowPungKong.push(oneChow[0]);
+    currentPlayer.chowPungKong.push(oneChow[1]);
+    currentPlayer.chowPungKong.push(lastDiscardTile);
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== oneChow[0].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== oneChow[1].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== lastDiscardTile.code)
+    });
+    currentPlayer.chowPungKong.sort(this.sortTilesInHand);
+
     // Set new state
     this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, disableDiscardButton });
   }
 
-  handlePung = (turn) => {
-    console.log(turn);
-
+  handleChowMiddle = (middleJoinChow) => {
     // Remove tileCode from discard pile
     let discardPile = { ...this.state.discardPile };
     let lastDiscardTile = discardPile.recentDiscard;
+    discardPile.main.pop();
+
+    // console.log("oneChow: ");
+    // console.log(oneChow);
+
+    // Set the last discarded tile to become empty
+    discardPile.recentDiscard = {};
+
+    // Put the discarded tile into the current player's hand
+    let currentPlayer = this.state["player" + this.state.turn];
+    currentPlayer.main.push(lastDiscardTile);
+
+    // Disable the Draw Tile button
+    let hasDrawnTile = true;
+    let disableDiscardButton = false;
+
+    // Set player.newTile object to the one obtained from chow
+    currentPlayer.newTile = lastDiscardTile;
+
+    // console.log("oneChow: oneChow: oneChow: ");
+    // console.log(oneChow);
+    // console.log(lastDiscardTile);
+    currentPlayer.chowPungKong.push(middleJoinChow[0]);
+    currentPlayer.chowPungKong.push(middleJoinChow[1]);
+    currentPlayer.chowPungKong.push(lastDiscardTile);
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== middleJoinChow[0].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== middleJoinChow[1].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== lastDiscardTile.code)
+    });
+    currentPlayer.chowPungKong.sort(this.sortTilesInHand);
+
+    // Set new state
+    this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, disableDiscardButton });
+  }
+
+  handleChowRight = (rightJoinChow) => {
+    // Remove tileCode from discard pile
+    let discardPile = { ...this.state.discardPile };
+    let lastDiscardTile = discardPile.recentDiscard;
+    discardPile.main.pop();
+
+    // console.log("oneChow: ");
+    // console.log(oneChow);
+
+    // Set the last discarded tile to become empty
+    discardPile.recentDiscard = {};
+
+    // Put the discarded tile into the current player's hand
+    let currentPlayer = this.state["player" + this.state.turn];
+    currentPlayer.main.push(lastDiscardTile);
+
+    // Disable the Draw Tile button
+    let hasDrawnTile = true;
+    let disableDiscardButton = false;
+
+    // Set player.newTile object to the one obtained from chow
+    currentPlayer.newTile = lastDiscardTile;
+
+    // console.log("oneChow: oneChow: oneChow: ");
+    // console.log(oneChow);
+    // console.log(lastDiscardTile);
+    currentPlayer.chowPungKong.push(rightJoinChow[0]);
+    currentPlayer.chowPungKong.push(rightJoinChow[1]);
+    currentPlayer.chowPungKong.push(lastDiscardTile);
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== rightJoinChow[0].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== rightJoinChow[1].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== lastDiscardTile.code)
+    });
+    currentPlayer.chowPungKong.sort(this.sortTilesInHand);
+
+    // Set new state
+    this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, disableDiscardButton });
+  }
+
+  handlePung = (turn, pung) => {
+    // Remove tileCode from discard pile
+    let discardPile = { ...this.state.discardPile };
+    let lastDiscardTile = discardPile.recentDiscard;
+    // console.log(turn);
+    // console.log(pung);
+    // console.log(lastDiscardTile);
     discardPile.main.pop();
 
     // Set the last discarded tile to become empty
@@ -449,11 +564,29 @@ class App extends Component {
     currentPlayer.main.push(lastDiscardTile);
 
     // Disable the Draw Tile button
-    let hasDrawnTile = false;
+    let hasDrawnTile = true;
     let disableDiscardButton = false;
 
     // Set player.newTile object to the one obtained from chow
     currentPlayer.newTile = lastDiscardTile;
+
+    currentPlayer.chowPungKong.push(pung[0]);
+    currentPlayer.chowPungKong.push(pung[1]);
+    currentPlayer.chowPungKong.push(lastDiscardTile);
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== pung[0].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== pung[1].code)
+    });
+    currentPlayer.main = currentPlayer.main.filter(tile => {
+      return (tile.code !== lastDiscardTile.code)
+    });
+    currentPlayer.chowPungKong.sort(this.sortTilesInHand);
+    // console.log("currentPlayer.main: ");
+    // console.log(currentPlayer.main);
+    // console.log("currentPlayer.chowPungKong: ");
+    // console.log(currentPlayer.chowPungKong);
 
     // Set new state
     this.setState({ [currentPlayer]: currentPlayer, discardPile, hasDrawnTile, turn, disableDiscardButton });
@@ -474,7 +607,7 @@ class App extends Component {
     } = this.state;
     let { disableChowButton, disablePungButton } = this.state;
 
-    console.log(this.state);
+    // console.log(player2);
 
     return (
       <React.Fragment>
@@ -495,12 +628,12 @@ class App extends Component {
         <Wall tiles={tiles} end={145} />
         <ClearFloat />
 
-        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
-        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
-        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
-        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChow={this.handleChow} />
+        <Hand player={player1} onClick={this.discardTile} turn={turn} playerNum="player1" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
+        <Hand player={player2} onClick={this.discardTile} turn={turn} playerNum="player2" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
+        <Hand player={player3} onClick={this.discardTile} turn={turn} playerNum="player3" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
+        <Hand player={player4} onClick={this.discardTile} turn={turn} playerNum="player4" handleDrawTile={this.handleDrawTile} hasDrawnTile={hasDrawnTile} disableDiscardButton={disableDiscardButton} handlePung={this.handlePung} disablePungButton={disablePungButton} discardPile={discardPile} disableChowButton={disableChowButton} handleChowLeft={this.handleChowLeft} handleChowMiddle={this.handleChowMiddle} handleChowRight={this.handleChowRight} />
 
-        <Discard player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} disableChowButton={disableChowButton} disablePungButton={disablePungButton} handleChow={this.handleChow} handlePung={this.handlePung} discardPile={discardPile} state={this.state} />
+        <Discard player={discardPile} bgColor="lightcoral" playerNum="player0" color="white" discard={true} disableChowButton={disableChowButton} disablePungButton={disablePungButton} handleChow={this.handleChowLeft} handlePung={this.handlePung} discardPile={discardPile} state={this.state} />
 
         <MessageList messages={messages} />
       </React.Fragment>

@@ -25,15 +25,15 @@ const Hand = ({
   disablePungButton,
   disableChowButton,
   discardPile,
-  handleChow
+  handleChowLeft,
+  handleChowMiddle,
+  handleChowRight
 }) => {
-
   let playerTurn = parseInt(playerNum.slice(-1));
   let disableDrawTileBtn = null;
 
   if (playerTurn === turn) {
     if (hasDrawnTile === false) {
-
       disableDrawTileBtn = false;
     } else {
       disableDrawTileBtn = true;
@@ -52,21 +52,23 @@ const Hand = ({
   let pungBgColor = null;
   let chowBgColor = null;
 
-  // Pung
+
   const recentDiscardCode = _.get(discardPile, "recentDiscard.code");
+  let pung = [];
+  const rightJoinChow = [];
+  const leftJoinChow = [];
+  const middleJoinChow = [];
+
   if (recentDiscardCode) {
-
-
-
-    // const currentPlayerHand = state["player" + state.turn].main;
     const currentPlayerHand = player.main;
+    // console.log(turn);
+    // console.log(currentPlayerHand);
     // Right Join Chow
     const tileIndex = recentDiscardCode.charAt(3);
     const plusOne = parseInt(tileIndex) + 1;
     const plusTwo = parseInt(tileIndex) + 2;
     const prefix = recentDiscardCode.substring(0, 3);
 
-    const rightJoinChow = [];
     const rightJoinChow1 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + plusOne)
     });
@@ -85,16 +87,12 @@ const Hand = ({
 
 
 
-
-
-
     // Left Join Chow
     // const tileIndex = recentDiscardCode.charAt(3);
     const minusOne = parseInt(tileIndex) - 1;
     const minusTwo = parseInt(tileIndex) - 2;
     // const prefix = recentDiscardCode.substring(0, 3);
 
-    const leftJoinChow = [];
     const leftJoinChow1 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + minusOne)
     });
@@ -112,27 +110,35 @@ const Hand = ({
     }
 
 
-
-
-
-
     // Middle Join Chow
     // const tileIndex = recentDiscardCode.charAt(3);
     const left = parseInt(tileIndex) - 1;
     const right = parseInt(tileIndex) + 1;
     // const prefix = recentDiscardCode.substring(0, 3);
+    // console.log(prefix + left);
+    // console.log(prefix + right);
+    // console.log(currentPlayerHand);
 
-    const middleJoinChow = [];
     const middleJoinChow1 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + left)
     });
     const middleJoinChow2 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + right)
     });
-    if (middleJoinChow1) middleJoinChow.push(middleJoinChow1);
-    if (middleJoinChow2) middleJoinChow.push(middleJoinChow2);
-    // console.log(middleJoinChow);
-    // console.log(middleJoinChow.length);
+    if (playerTurn === turn) console.log(middleJoinChow1);
+    if (playerTurn === turn) console.log(middleJoinChow2);
+
+    if (playerTurn === turn) {
+      if (middleJoinChow1) {
+        middleJoinChow.push(middleJoinChow1);
+        console.log("what?");
+      }
+      if (middleJoinChow2) {
+        middleJoinChow.push(middleJoinChow2);
+        console.log("Chicken?");
+      }
+      console.log(middleJoinChow);
+    }
 
     if (playerTurn === turn && middleJoinChow.length === 2) {
       disableChowButton = false;
@@ -158,11 +164,11 @@ const Hand = ({
 
     // const tileIndex = recentDiscardCode.charAt(3);
     // const prefix = recentDiscardCode.substring(0, 3);
-    const pung = player.main.filter(tile => {
+    pung = player.main.filter(tile => {
       return tile.code.includes(prefix + tileIndex)
     });
-    console.log('pung: ');
-    console.log(pung);
+    // console.log('pung: ');
+    // console.log(pung);
 
     if (pung.length === 2) {
       disablePungButton = false;
@@ -170,8 +176,49 @@ const Hand = ({
     }
   }
 
+  if (playerTurn === turn) {
+    if (hasDrawnTile) {
+      // console.log(disablePungButton);
+      disablePungButton = true;
+      pungBgColor = null;
+    }
+  }
+
+  // console.log(discardPile.recentDiscard.prevOwner); // result: player1
+  // console.log(playerNum);
+  if (discardPile.recentDiscard.prevOwner === playerNum) {
+    disablePungButton = true;
+    pungBgColor = null;
+  }
+  // if (discardPile.recentDiscard && discardPile.recentDiscard.prevOwner === 1) {
+  //   disablePungButton = true;
+  // }
+
+  // console.log(`hasDrawnTile hasDrawnTile hasDrawnTile: ${hasDrawnTile}`);
+
+  let chowCount = 0;
+  let oneChow = [];
+
+  if (rightJoinChow.length > 1) chowCount = chowCount + 1;
+  if (leftJoinChow.length > 1) chowCount = chowCount + 1;
+  if (middleJoinChow.length > 1) chowCount = chowCount + 1;
+  if (playerTurn === turn) console.log(chowCount);
+  if (chowCount === 1) {
+    if (rightJoinChow.length > 1) oneChow = [...rightJoinChow];
+    if (leftJoinChow.length > 1) oneChow = [...leftJoinChow];
+    if (middleJoinChow.length > 1) oneChow = [...middleJoinChow];
+  }
+
+
+
+  if (playerTurn === turn) {
+    console.log(chowCount);
+    console.log(rightJoinChow);
+    console.log(discardPile.recentDiscard.code);
+  }
+
   return (
-    <span style={{ float: "left", width: "160px", backgroundColor: highlightPlayerTurn }}>
+    <div style={{ float: "left", width: "230px", backgroundColor: highlightPlayerTurn }}>
       <div style={{ paddingBottom: "16px" }}>
         {playerNum}
         {/* <Button name="drawTile" label="Draw Tile" onClick={handleDrawTile} disableDrawTileBtn={disableDrawTileBtn} /> */}
@@ -179,29 +226,55 @@ const Hand = ({
           Draw Tile
         </button>
 
-        <button name="pung" style={{ backgroundColor: pungBgColor }} onClick={() => handlePung(playerTurn)} disabled={disablePungButton}>
+        <button name="pung" style={{ backgroundColor: pungBgColor }} onClick={() => handlePung(playerTurn, pung)} disabled={disablePungButton}>
           Pung
         </button>
-        <button style={{ backgroundColor: chowBgColor }} onClick={handleChow} disabled={disableChowButton}>Chow</button>
+        {(rightJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowRight(rightJoinChow)} disabled={disableChowButton}>R-Chow</button>}
+        {(leftJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowLeft(leftJoinChow)} disabled={disableChowButton}>L-Chow</button>}
+        {(middleJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowMiddle(middleJoinChow)} disabled={disableChowButton}>M-Chow</button>}
         Tiles in Hand: {player.main.length}
       </div>
       {player.main.map((tile, index) => {
         bgColor = (tile.code === player.newTile.code) ? "lightseagreen" : "lightblue";
 
         return (
-          <button
-            key={index}
-            name={playerNum}
-            style={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px", color }}
-            onClick={() => onClick(tile.code, playerNum)}
-            disabled={disableDiscardButton}
-          >
-            {tile.label}
-          </button>
+          <React.Fragment key={index}>
+            <button
+              name={playerNum}
+              style={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px", color }}
+              onClick={() => onClick(tile.code, playerNum)}
+              disabled={disableDiscardButton}
+            >
+              {tile.label}
+            </button>
+            {(rightJoinChow.length === 2)
+              && (tile.code === rightJoinChow[0].code || tile.code === rightJoinChow[1].code)
+              && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowRight(rightJoinChow)} disabled={disableChowButton}>R-C</button>}
+            {(leftJoinChow.length === 2)
+              && (tile.code === leftJoinChow[0].code || tile.code === leftJoinChow[1].code)
+              && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowLeft(leftJoinChow)} disabled={disableChowButton}>L-C</button>}
+            {(middleJoinChow.length === 2)
+              && (tile.code === middleJoinChow[0].code || tile.code === middleJoinChow[1].code)
+              && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowMiddle(middleJoinChow)} disabled={disableChowButton}>M-C</button>}
+          </React.Fragment>
         )
       })}
 
-    </span>
+      {player.chowPungKong.length >= 3 && <div style={{ paddingTop: "20px" }}>
+        {player.chowPungKong.map((tile, index) => {
+          return (
+            <button
+              key={index}
+              style={{ backgroundColor: "white", marginBottom: "2px", width: "130px", color }}
+              disabled={true}
+            >
+              {tile.label}
+            </button>
+          )
+        })}
+      </div>}
+
+    </div>
   );
 }
 

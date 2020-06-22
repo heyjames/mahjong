@@ -136,7 +136,7 @@ const Discard = ({
 
         return (
           <React.Fragment key={index}>
-            <button style={{ backgroundColor: discardBgColor, width: "130px" }}>{tile.label}</button>
+            <button style={{ backgroundColor: discardBgColor, width: "140px" }}>{tile.label}</button>
             {/* {tile.code === player.recentDiscard.code && <button key={"a" + index} style={{ backgroundColor: discardBgColor, width: "24px" }} onClick={() => handleChow(tile.code)} disabled={disableChowButton}>C</button>}
             {tile.code === player.recentDiscard.code && <button key={"b" + index} style={{ backgroundColor: discardBgColor, width: "24px" }} onClick={() => handlePung(tile.code)} disabled={disablePungButton}>P</button>} */}
           </React.Fragment>
