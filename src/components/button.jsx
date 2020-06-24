@@ -1,9 +1,33 @@
 import React from 'react';
 
-const Button = ({ name, label, onClick, disableDrawTileBtn }) => {
+const Button = ({
+  name,
+  label,
+  onClick,
+  disabled,
+  css
+}) => {
   return (
-    <button name={name} onClick={onClick} disabled={disableDrawTileBtn}>{label}</button>
+    <button
+      name={name}
+      style={css}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {label}
+    </button>
   );
 }
+
+{/* 
+Quick copy-paste
+<Button
+  name=
+  label=
+  onClick=
+  disabled=
+  css=
+/> 
+*/}
 
 export default Button;

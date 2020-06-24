@@ -7,7 +7,11 @@ const MessageList = ({ messages }) => {
         return (
           <div
             key={index}
-            style={{ backgroundColor: "yellow", marginBottom: "2px", width: "170px" }}
+            style={{
+              backgroundColor: "yellow",
+              marginBottom: "2px",
+              width: "170px"
+            }}
           >
             {message}
           </div>

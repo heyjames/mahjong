@@ -1,5 +1,5 @@
 import React from 'react';
-// import Button from './button';
+import Button from './button';
 import _ from 'lodash';
 
 const sortTilesInHand = (a, b) => {
@@ -13,24 +13,26 @@ const sortTilesInHand = (a, b) => {
 
 const Hand = ({
   player,
-  onClick = null,
+  discardTile,
   playerNum,
   bgColor = "lightblue",
   turn,
-  color,
   handleDrawTile,
   hasDrawnTile,
   disableDiscardButton,
-  handlePung,
   disablePungButton,
   disableChowButton,
   discardPile,
-  handleChowLeft,
-  handleChowMiddle,
-  handleChowRight,
   disableKongButton,
-  handleKong
+  handleExposeTileSet
 }) => {
+
+  let styleChowPungKongTiles = {
+    backgroundColor: "white",
+    marginBottom: "2px",
+    width: "130px"
+  };
+
   let playerTurn = parseInt(playerNum.slice(-1));
   let disableDrawTileBtn = null;
 
@@ -65,8 +67,7 @@ const Hand = ({
 
   if (recentDiscardCode) {
     const currentPlayerHand = player.main;
-    // console.log(turn);
-    // console.log(currentPlayerHand);
+
     // Right Join Chow
     const tileIndex = recentDiscardCode.charAt(3);
     const plusOne = parseInt(tileIndex) + 1;
@@ -81,21 +82,15 @@ const Hand = ({
     });
     if (rightJoinChow1) rightJoinChow.push(rightJoinChow1);
     if (rightJoinChow2) rightJoinChow.push(rightJoinChow2);
-    // console.log(rightJoinChow);
-    // console.log(rightJoinChow.length);
 
     if (playerTurn === turn && rightJoinChow.length === 2) {
       disableChowButton = false;
       chowBgColor = "lightcoral";
     }
 
-
-
     // Left Join Chow
-    // const tileIndex = recentDiscardCode.charAt(3);
     const minusOne = parseInt(tileIndex) - 1;
     const minusTwo = parseInt(tileIndex) - 2;
-    // const prefix = recentDiscardCode.substring(0, 3);
 
     const leftJoinChow1 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + minusOne)
@@ -105,23 +100,15 @@ const Hand = ({
     });
     if (leftJoinChow1) leftJoinChow.push(leftJoinChow1);
     if (leftJoinChow2) leftJoinChow.push(leftJoinChow2);
-    // console.log(leftJoinChow);
-    // console.log(leftJoinChow.length);
 
     if (playerTurn === turn && leftJoinChow.length === 2) {
       disableChowButton = false;
       chowBgColor = "lightcoral";
     }
 
-
     // Middle Join Chow
-    // const tileIndex = recentDiscardCode.charAt(3);
     const left = parseInt(tileIndex) - 1;
     const right = parseInt(tileIndex) + 1;
-    // const prefix = recentDiscardCode.substring(0, 3);
-    // console.log(prefix + left);
-    // console.log(prefix + right);
-    // console.log(currentPlayerHand);
 
     const middleJoinChow1 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + left)
@@ -129,19 +116,14 @@ const Hand = ({
     const middleJoinChow2 = currentPlayerHand.find(tile => {
       return tile.code.includes(prefix + right)
     });
-    // if (playerTurn === turn) console.log(middleJoinChow1);
-    // if (playerTurn === turn) console.log(middleJoinChow2);
 
     if (playerTurn === turn) {
       if (middleJoinChow1) {
         middleJoinChow.push(middleJoinChow1);
-        // console.log("what?");
       }
       if (middleJoinChow2) {
         middleJoinChow.push(middleJoinChow2);
-        // console.log("Chicken?");
       }
-      // console.log(middleJoinChow);
     }
 
     if (playerTurn === turn && middleJoinChow.length === 2) {
@@ -149,42 +131,18 @@ const Hand = ({
       chowBgColor = "lightcoral";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // const tileIndex = recentDiscardCode.charAt(3);
-    // const prefix = recentDiscardCode.substring(0, 3);
     pung = player.main.filter(tile => {
       return tile.code.includes(prefix + tileIndex)
     });
-    // console.log('pung: ');
-    // console.log(pung);
 
     if (pung.length === 2) {
       disablePungButton = false;
       pungBgColor = "red";
     }
 
-
     kong = player.main.filter(tile => {
       return tile.code.includes(prefix + tileIndex)
     });
-    console.log('kong: ');
-    console.log(kong);
 
     if (kong.length === 3) {
       disableKongButton = false;
@@ -208,86 +166,97 @@ const Hand = ({
     kongBgColor = null;
   }
 
-  let chowCount = 0;
-  let oneChow = [];
-
-  if (rightJoinChow.length > 1) chowCount = chowCount + 1;
-  if (leftJoinChow.length > 1) chowCount = chowCount + 1;
-  if (middleJoinChow.length > 1) chowCount = chowCount + 1;
-  // if (playerTurn === turn) console.log(chowCount);
-  if (chowCount === 1) {
-    if (rightJoinChow.length > 1) oneChow = [...rightJoinChow];
-    if (leftJoinChow.length > 1) oneChow = [...leftJoinChow];
-    if (middleJoinChow.length > 1) oneChow = [...middleJoinChow];
-  }
-
-
-
-  if (playerTurn === turn) {
-    // console.log(chowCount);
-    // console.log(rightJoinChow);
-    // console.log(discardPile.recentDiscard.code);
-  }
-
   return (
     <div style={{ float: "left", width: "230px", backgroundColor: highlightPlayerTurn }}>
       <div style={{ paddingBottom: "16px" }}>
         {playerNum}
-        {/* <Button name="drawTile" label="Draw Tile" onClick={handleDrawTile} disableDrawTileBtn={disableDrawTileBtn} /> */}
-        <button name="drawTile" onClick={handleDrawTile} disabled={disableDrawTileBtn}>
-          Draw Tile
-        </button>
+        <div>
+          <Button
+            name="drawTile"
+            label="Draw Tile"
+            onClick={handleDrawTile}
+            disabled={disableDrawTileBtn}
+          />
 
-        <button name="pung" style={{ backgroundColor: pungBgColor }} onClick={() => handlePung(playerTurn, pung)} disabled={disablePungButton}>
-          Pung
-        </button>
-        <button name="kong" style={{ backgroundColor: kongBgColor }} onClick={() => handleKong(playerTurn, kong)} disabled={disableKongButton}>
-          Kong
-        </button>
-        {(rightJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowRight(rightJoinChow)} disabled={disableChowButton}>R-Chow</button>}
-        {(leftJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowLeft(leftJoinChow)} disabled={disableChowButton}>L-Chow</button>}
-        {(middleJoinChow.length === 2) && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowMiddle(middleJoinChow)} disabled={disableChowButton}>M-Chow</button>}
-        Tiles in Hand: {player.main.length}
+          <Button
+            name="pung"
+            label="Pung"
+            onClick={() => handleExposeTileSet(playerTurn, pung)}
+            disabled={disablePungButton}
+            css={{ backgroundColor: pungBgColor }}
+          />
+
+          <Button
+            name="kong"
+            label="Kong"
+            onClick={() => handleExposeTileSet(playerTurn, kong)}
+            disabled={disableKongButton}
+            css={{ backgroundColor: kongBgColor }}
+          />
+        </div>
+
+        <div>Tile Count: {player.main.length}</div>
       </div>
       {player.main.map((tile, index) => {
         bgColor = (tile.code === player.newTile.code) ? "lightseagreen" : "lightblue";
 
         return (
           <React.Fragment key={index}>
-            <button
+            <Button
               name={playerNum}
-              style={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px", color }}
-              onClick={() => onClick(tile.code, playerNum)}
+              label={tile.label}
+              onClick={() => discardTile(tile.code, playerNum)}
               disabled={disableDiscardButton}
-            >
-              {tile.label}
-            </button>
+              css={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px" }}
+            />
             {(rightJoinChow.length === 2)
               && (tile.code === rightJoinChow[0].code || tile.code === rightJoinChow[1].code)
-              && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowRight(rightJoinChow)} disabled={disableChowButton}>R-C</button>}
+              && <Button
+                name="r-chow"
+                label="R-C"
+                onClick={() => handleExposeTileSet(playerTurn, rightJoinChow)}
+                disabled={disableChowButton}
+                css={{ backgroundColor: chowBgColor }}
+              />
+            }
             {(leftJoinChow.length === 2)
               && (tile.code === leftJoinChow[0].code || tile.code === leftJoinChow[1].code)
-              && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowLeft(leftJoinChow)} disabled={disableChowButton}>L-C</button>}
+              && <Button
+                name="l-chow"
+                label="L-C"
+                onClick={() => handleExposeTileSet(playerTurn, leftJoinChow)}
+                disabled={disableChowButton}
+                css={{ backgroundColor: chowBgColor }}
+              />
+            }
             {(middleJoinChow.length === 2)
               && (tile.code === middleJoinChow[0].code || tile.code === middleJoinChow[1].code)
-              && <button style={{ backgroundColor: chowBgColor }} onClick={() => handleChowMiddle(middleJoinChow)} disabled={disableChowButton}>M-C</button>}
+              && <Button
+                name="m-chow"
+                label="M-C"
+                css={{ backgroundColor: chowBgColor }}
+                onClick={() => handleExposeTileSet(playerTurn, middleJoinChow)}
+                disabled={disableChowButton}
+              />
+            }
           </React.Fragment>
         )
       })}
 
-      {player.chowPungKong.length >= 3 && <div style={{ paddingTop: "20px" }}>
-        {player.chowPungKong.map((tile, index) => {
-          return (
-            <button
-              key={index}
-              style={{ backgroundColor: "white", marginBottom: "2px", width: "130px", color }}
-              disabled={true}
-            >
-              {tile.label}
-            </button>
-          )
-        })}
-      </div>}
+      {player.chowPungKong.length >= 3
+        && <div style={{ paddingTop: "20px" }}>
+          {player.chowPungKong.map((tile, index) => {
+            return (
+              <Button
+                key={index}
+                name={playerNum + "_" + tile.code}
+                label={tile.label}
+                css={styleChowPungKongTiles}
+                disabled={true}
+              />
+            )
+          })}
+        </div>}
 
     </div>
   );
