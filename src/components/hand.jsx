@@ -2,15 +2,6 @@ import React from 'react';
 import Button from './button';
 import _ from 'lodash';
 
-const sortTilesInHand = (a, b) => {
-  const nameA = a.code.substring(0, 5).toUpperCase();
-  const nameB = b.code.substring(0, 5).toUpperCase();
-  if (nameA < nameB) return -1;
-  if (nameA > nameB) return 1;
-
-  return 0; // names must be equal
-}
-
 const Hand = ({
   player,
   playerTurn,
@@ -61,9 +52,6 @@ const Hand = ({
   //   disableDiscardButton = true;
   //   disableDrawTileBtn = true;
   // }
-
-
-
 
 
 

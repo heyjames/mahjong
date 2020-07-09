@@ -9,6 +9,7 @@ import MessageList from './components/messageList';
 import testState from './testState4.json';
 import ControlPanel from './components/controlPanel';
 // import testState from './testState5_kong.json';
+import { sortArray, shuffleArray } from './utils/array';
 import _ from 'lodash';
 
 class App extends Component {
@@ -235,21 +236,12 @@ class App extends Component {
     let player3 = { ...this.state.player3 };
     let player4 = { ...this.state.player4 };
 
-    player1.main.sort(this.sortTilesInHand);
-    player2.main.sort(this.sortTilesInHand);
-    player3.main.sort(this.sortTilesInHand);
-    player4.main.sort(this.sortTilesInHand);
+    player1.main.sort(sortArray);
+    player2.main.sort(sortArray);
+    player3.main.sort(sortArray);
+    player4.main.sort(sortArray);
 
     this.setState({ player1, player2, player3, player4 });
-  }
-
-  sortTilesInHand = (a, b) => {
-    const nameA = a.code.substring(0, 5).toUpperCase();
-    const nameB = b.code.substring(0, 5).toUpperCase();
-    if (nameA < nameB) return -1;
-    if (nameA > nameB) return 1;
-
-    return 0; // names must be equal
   }
 
   tileCountVerification = () => {
@@ -273,20 +265,8 @@ class App extends Component {
     (totalTiles !== 144) && console.log("Total tiles is not what it should be.");
   }
 
-  // https://medium.com/@nitinpatel_20236/how-to-shuffle-correctly-shuffle-an-array-in-javascript-15ea3f84bfb
-  shuffle = (arr) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i);
-      const temp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = temp;
-    }
-
-    return arr;
-  }
-
   handleShuffle = () => {
-    let tiles = this.shuffle([...this.state.tiles]);
+    let tiles = shuffleArray([...this.state.tiles]);
     this.outputMessage("Shuffled.");
 
     this.setState({ tiles });
@@ -328,10 +308,10 @@ class App extends Component {
     player3.main = this.getTileChunk(tiles, player3.main, 0, 1);
     player4.main = this.getTileChunk(tiles, player4.main, 0, 1);
 
-    player1.main.sort(this.sortTilesInHand);
-    player2.main.sort(this.sortTilesInHand);
-    player3.main.sort(this.sortTilesInHand);
-    player4.main.sort(this.sortTilesInHand);
+    player1.main.sort(sortArray);
+    player2.main.sort(sortArray);
+    player3.main.sort(sortArray);
+    player4.main.sort(sortArray);
 
     let turn = 1;
     this.outputMessage(`Waiting for player ${turn}...`);
@@ -343,7 +323,7 @@ class App extends Component {
     this.outputMessage(message);
 
     let tiles = [...this.tiles];
-    tiles = this.shuffle(tiles);
+    tiles = shuffleArray(tiles);
 
     this.setState({
       tiles,
@@ -480,7 +460,7 @@ class App extends Component {
       });
     }
 
-    currentPlayer.chowPungKong.sort(this.sortTilesInHand);
+    currentPlayer.chowPungKong.sort(sortArray);
 
     this.setState({
       [currentPlayer]: currentPlayer,
@@ -535,7 +515,7 @@ class App extends Component {
 
       // disableDrawTileBtn = (player.main.length >= 14) ? true : false;
 
-      player.main.sort(this.sortTilesInHand);
+      player.main.sort(sortArray);
     } else {
       disableDiscardButton = true;
       disableDrawTileBtn = true;
