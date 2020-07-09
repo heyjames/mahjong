@@ -7,8 +7,9 @@ import Discard from './components/discard';
 import ClearFloat from './components/clearFloat';
 import MessageList from './components/messageList';
 import testState from './testState4.json';
+import ControlPanel from './components/controlPanel';
 // import testState from './testState5_kong.json';
-// import _ from 'lodash';
+import _ from 'lodash';
 
 class App extends Component {
   constructor(props) {
@@ -225,6 +226,7 @@ class App extends Component {
     // this.sortAllHands();
 
     // this.tileCountVerification();
+    this.renderHands();
   }
 
   sortAllHands = () => {
@@ -405,8 +407,9 @@ class App extends Component {
     let player = { ...this.state[playerNum] };
     let discardPile = { ...this.state.discardPile };
     let turn = this.state.turn;
-    let hasDrawnTile = this.state.hasDrawnTile;
-    hasDrawnTile = false;
+    // let hasDrawnTile = this.state.hasDrawnTile;
+    let hasDrawnTile = false;
+    let disableDiscardButton = true;
 
     // Get tile to be removed and place in discard pile.
     let discardingTile = player.main.filter(tile => {
@@ -434,7 +437,8 @@ class App extends Component {
       [playerNum]: player,
       discardPile,
       turn,
-      hasDrawnTile
+      hasDrawnTile,
+      disableDiscardButton
     });
   }
 
@@ -454,6 +458,7 @@ class App extends Component {
     // Disable the Draw Tile button and allow discarding tile mode
     let hasDrawnTile = true;
     let disableDiscardButton = false;
+    let disableDrawTileBtn = true;
 
     // Set player.newTile object to the one obtained from chow
     // This can be useful to know when it is the winning move
@@ -481,13 +486,270 @@ class App extends Component {
       [currentPlayer]: currentPlayer,
       discardPile,
       hasDrawnTile,
-      disableDiscardButton
+      disableDiscardButton,
+      disableDrawTileBtn,
+      turn
     });
+  }
+
+  isPlayerTurn = (player) => {
+    const playerTurnNum = parseInt(player.slice(-1));
+    return (this.state.turn === playerTurnNum) ? true : false;
+  }
+
+  renderHand = (playerNum) => {
+    const {
+      discardPile,
+      turn,
+      hasDrawnTile
+    } = this.state;
+
+    let {
+      disableChowButton,
+      disableDiscardButton,
+      disablePungButton,
+      disableKongButton,
+      disableDrawTileBtn
+    } = this.state;
+    
+    let player = this.state[playerNum];
+
+
+
+
+
+
+
+
+
+    
+    let playerTurn = parseInt(playerNum.slice(-1));
+    // let disableDrawTileBtn = null;
+
+    if (playerTurn === turn) {
+      if (hasDrawnTile === false) {
+        disableDrawTileBtn = false;
+      } else {
+        disableDrawTileBtn = true;
+      }
+
+      // disableDrawTileBtn = (player.main.length >= 14) ? true : false;
+
+      player.main.sort(this.sortTilesInHand);
+    } else {
+      disableDiscardButton = true;
+      disableDrawTileBtn = true;
+    }
+    
+
+
+
+
+
+
+
+
+
+    let highlightPlayerTurn = (playerTurn === turn) ? "lightgreen" : null;
+
+    let pungBgColor = null;
+    let kongBgColor = null;
+    let chowBgColor = null;
+
+
+    const recentDiscardCode = _.get(discardPile, "recentDiscard.code");
+    let pung = [];
+    let kong = [];
+    const rightJoinChow = [];
+    const leftJoinChow = [];
+    const middleJoinChow = [];
+
+    if (recentDiscardCode) {
+      const currentPlayerHand = player.main;
+
+      // Right Join Chow
+      const tileIndex = recentDiscardCode.charAt(3);
+      const plusOne = parseInt(tileIndex) + 1;
+      const plusTwo = parseInt(tileIndex) + 2;
+      const prefix = recentDiscardCode.substring(0, 3);
+
+      const rightJoinChow1 = currentPlayerHand.find(tile => {
+        return tile.code.includes(prefix + plusOne)
+      });
+      const rightJoinChow2 = currentPlayerHand.find(tile => {
+        return tile.code.includes(prefix + plusTwo)
+      });
+      if (rightJoinChow1) rightJoinChow.push(rightJoinChow1);
+      if (rightJoinChow2) rightJoinChow.push(rightJoinChow2);
+
+      if (playerTurn === turn && rightJoinChow.length === 2) {
+        disableChowButton = false;
+        chowBgColor = "lightcoral";
+      }
+
+      // Left Join Chow
+      const minusOne = parseInt(tileIndex) - 1;
+      const minusTwo = parseInt(tileIndex) - 2;
+
+      const leftJoinChow1 = currentPlayerHand.find(tile => {
+        return tile.code.includes(prefix + minusOne)
+      });
+      const leftJoinChow2 = currentPlayerHand.find(tile => {
+        return tile.code.includes(prefix + minusTwo)
+      });
+      if (leftJoinChow1) leftJoinChow.push(leftJoinChow1);
+      if (leftJoinChow2) leftJoinChow.push(leftJoinChow2);
+
+      if (playerTurn === turn && leftJoinChow.length === 2) {
+        disableChowButton = false;
+        chowBgColor = "lightcoral";
+      }
+
+      // Middle Join Chow
+      const left = parseInt(tileIndex) - 1;
+      const right = parseInt(tileIndex) + 1;
+
+      const middleJoinChow1 = currentPlayerHand.find(tile => {
+        return tile.code.includes(prefix + left)
+      });
+      const middleJoinChow2 = currentPlayerHand.find(tile => {
+        return tile.code.includes(prefix + right)
+      });
+
+      if (playerTurn === turn) {
+        if (middleJoinChow1) {
+          middleJoinChow.push(middleJoinChow1);
+        }
+        if (middleJoinChow2) {
+          middleJoinChow.push(middleJoinChow2);
+        }
+      }
+
+      if (playerTurn === turn && middleJoinChow.length === 2) {
+        disableChowButton = false;
+        chowBgColor = "lightcoral";
+      }
+
+      pung = player.main.filter(tile => {
+        return tile.code.includes(prefix + tileIndex)
+      });
+
+      if (pung.length === 2) {
+        disablePungButton = false;
+        pungBgColor = "red";
+      } else {
+        disablePungButton = true;
+      }
+
+      kong = player.main.filter(tile => {
+        return tile.code.includes(prefix + tileIndex)
+      });
+
+      if (kong.length === 3) {
+        disableKongButton = false;
+        kongBgColor = "red";
+      } else {
+        disableKongButton = true;
+      }
+    } else {
+      disablePungButton = true;
+      disableKongButton = true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    // Prevent pung/kong after current player decided to draw a tile
+    if (playerTurn === turn) {
+      if (hasDrawnTile) {
+        disablePungButton = true;
+        disableKongButton = true;
+        pungBgColor = null;
+        kongBgColor = null;
+      }
+    }
+
+    // So user can't pung/kong their own discarded tile
+    if (discardPile.recentDiscard.prevOwner === playerNum) {
+      disablePungButton = true;
+      disableKongButton = true;
+      pungBgColor = null;
+      kongBgColor = null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    return (
+      <Hand
+        player={player}
+        playerTurn={playerTurn}
+        discardTile={this.discardTile}
+        turn={turn}
+        playerNum={playerNum}
+        handleDrawTile={this.handleDrawTile}
+        hasDrawnTile={hasDrawnTile}
+        disableDiscardButton={disableDiscardButton}
+        disablePungButton={disablePungButton}
+        discardPile={discardPile}
+        disableChowButton={disableChowButton}
+        handleExposeTileSet={this.handleExposeTileSet}
+        disableKongButton={disableKongButton}
+        disableDrawTileBtn={disableDrawTileBtn}
+        pung={pung}
+        pungBgColor={pungBgColor}
+        kong={kong}
+        kongBgColor={kongBgColor}
+        rightJoinChow={rightJoinChow}
+        chowBgColor={chowBgColor}
+        leftJoinChow={leftJoinChow}
+        middleJoinChow={middleJoinChow}
+      />
+    )
+  }
+
+  renderHands = () => {
+    return (
+      <React.Fragment>
+        {this.renderHand("player1")}
+        {this.renderHand("player2")}
+        {this.renderHand("player3")}
+        {this.renderHand("player4")}
+      </React.Fragment>
+    )
   }
 
   render() {
     const {
       tiles,
+      player1,
+      player2,
+      player3,
+      player4,
       discardPile,
       turn,
       messages,
@@ -498,29 +760,16 @@ class App extends Component {
       disableKongButton
     } = this.state;
 
-    // console.log(this.state);
     const totalPlayers = ["player1", "player2", "player3", "player4"];
 
     return (
       <React.Fragment>
-        <div>
-          <Button
-            name="shuffle"
-            label="Shuffle"
-            onClick={this.handleShuffle}
-          />
-          <Button
-            name="clearMessages"
-            label="Clear Messages"
-            onClick={this.handleClearMessages}
-          />
-          <Button
-            name="reset"
-            label="Reset"
-            onClick={this.handleReset}
-          />
-          <span>Wall Tile Count: {tiles.length}</span>
-        </div>
+        <ControlPanel 
+          tiles={tiles}
+          handleShuffle={this.handleShuffle}
+          handleClearMessages={this.handleClearMessages}
+          handleReset={this.handleReset}
+        />
 
         <Wall tiles={tiles} end={18} />
         <Wall tiles={tiles} end={36} />
@@ -532,25 +781,7 @@ class App extends Component {
         <Wall tiles={tiles} end={145} />
         <ClearFloat />
 
-        {totalPlayers.map((player, index) => {
-          return (
-            <Hand
-              key={index}
-              player={this.state[player]}
-              discardTile={this.discardTile}
-              turn={turn}
-              playerNum={player.toString()}
-              handleDrawTile={this.handleDrawTile}
-              hasDrawnTile={hasDrawnTile}
-              disableDiscardButton={disableDiscardButton}
-              disablePungButton={disablePungButton}
-              discardPile={discardPile}
-              disableChowButton={disableChowButton}
-              handleExposeTileSet={this.handleExposeTileSet}
-              disableKongButton={disableKongButton}
-            />
-          );
-        })}
+        {this.renderHands()}
 
         <Discard player={discardPile} playerNum="player0" />
         <MessageList messages={messages} />

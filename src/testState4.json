@@ -1217,6 +1217,7 @@
   "hasDrawnTile": true,
   "disableDiscardButton": false,
   "disableChowButton": true,
+  "disableDrawTileBtn": true,
   "[object Object]": {
     "main": [
       {
