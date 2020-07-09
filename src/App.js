@@ -477,6 +477,19 @@ class App extends Component {
     return (this.state.turn === playerTurnNum) ? true : false;
   }
 
+  addChowTilesInHandToChowTypeArray = (chowType, prefix, suffix1, suffix2, currentPlayerHand) => {
+    const chowMatch1 = currentPlayerHand.find(tile => {
+      return tile.code.includes(prefix + suffix1)
+    });
+    
+    const chowMatch2 = currentPlayerHand.find(tile => {
+      return tile.code.includes(prefix + suffix2)
+    });
+
+    if (chowMatch1) chowType.push(chowMatch1);
+    if (chowMatch2) chowType.push(chowMatch2);
+  }
+
   renderHand = (playerNum) => {
     const {
       discardPile,
@@ -493,75 +506,35 @@ class App extends Component {
     } = this.state;
     
     let player = this.state[playerNum];
-
-
-
-
-
-
-
-
-
-    
     let playerTurn = parseInt(playerNum.slice(-1));
-    // let disableDrawTileBtn = null;
-
-    if (playerTurn === turn) {
-      if (hasDrawnTile === false) {
-        disableDrawTileBtn = false;
-      } else {
-        disableDrawTileBtn = true;
-      }
-
-      // disableDrawTileBtn = (player.main.length >= 14) ? true : false;
-
-      player.main.sort(sortArray);
-    } else {
-      disableDiscardButton = true;
-      disableDrawTileBtn = true;
-    }
     
 
-
-
-
-
-
-
-
-
-    let highlightPlayerTurn = (playerTurn === turn) ? "lightgreen" : null;
 
     let pungBgColor = null;
     let kongBgColor = null;
     let chowBgColor = null;
-
-
     const recentDiscardCode = _.get(discardPile, "recentDiscard.code");
+    
     let pung = [];
     let kong = [];
     const rightJoinChow = [];
     const leftJoinChow = [];
     const middleJoinChow = [];
 
-    if (recentDiscardCode) {
+    // If the discard pile has a tile, initiate Chow checks
+    if (recentDiscardCode && (playerTurn === turn)) {
       const currentPlayerHand = player.main;
 
-      // Right Join Chow
-      const tileIndex = recentDiscardCode.charAt(3);
+      // Get last discarded tile's code specifics
+      const tileIndex = recentDiscardCode.charAt(3); // 2
+      const prefix = recentDiscardCode.substring(0, 3); // bar
+
+      // If right join Chow tiles exist in hand, add to array
       const plusOne = parseInt(tileIndex) + 1;
       const plusTwo = parseInt(tileIndex) + 2;
-      const prefix = recentDiscardCode.substring(0, 3);
-
-      const rightJoinChow1 = currentPlayerHand.find(tile => {
-        return tile.code.includes(prefix + plusOne)
-      });
-      const rightJoinChow2 = currentPlayerHand.find(tile => {
-        return tile.code.includes(prefix + plusTwo)
-      });
-      if (rightJoinChow1) rightJoinChow.push(rightJoinChow1);
-      if (rightJoinChow2) rightJoinChow.push(rightJoinChow2);
-
+      this.addChowTilesInHandToChowTypeArray(rightJoinChow, prefix, plusOne, plusTwo, currentPlayerHand);
+      
+      // If right join Chow tiles exist in hand, enable Chow button
       if (playerTurn === turn && rightJoinChow.length === 2) {
         disableChowButton = false;
         chowBgColor = "lightcoral";
@@ -570,16 +543,9 @@ class App extends Component {
       // Left Join Chow
       const minusOne = parseInt(tileIndex) - 1;
       const minusTwo = parseInt(tileIndex) - 2;
+      this.addChowTilesInHandToChowTypeArray(leftJoinChow, prefix, minusOne, minusTwo, currentPlayerHand);
 
-      const leftJoinChow1 = currentPlayerHand.find(tile => {
-        return tile.code.includes(prefix + minusOne)
-      });
-      const leftJoinChow2 = currentPlayerHand.find(tile => {
-        return tile.code.includes(prefix + minusTwo)
-      });
-      if (leftJoinChow1) leftJoinChow.push(leftJoinChow1);
-      if (leftJoinChow2) leftJoinChow.push(leftJoinChow2);
-
+      // If left join Chow tiles exist in hand, enable Chow button
       if (playerTurn === turn && leftJoinChow.length === 2) {
         disableChowButton = false;
         chowBgColor = "lightcoral";
@@ -588,32 +554,18 @@ class App extends Component {
       // Middle Join Chow
       const left = parseInt(tileIndex) - 1;
       const right = parseInt(tileIndex) + 1;
+      this.addChowTilesInHandToChowTypeArray(middleJoinChow, prefix, left, right, currentPlayerHand);
 
-      const middleJoinChow1 = currentPlayerHand.find(tile => {
-        return tile.code.includes(prefix + left)
-      });
-      const middleJoinChow2 = currentPlayerHand.find(tile => {
-        return tile.code.includes(prefix + right)
-      });
-
-      if (playerTurn === turn) {
-        if (middleJoinChow1) {
-          middleJoinChow.push(middleJoinChow1);
-        }
-        if (middleJoinChow2) {
-          middleJoinChow.push(middleJoinChow2);
-        }
-      }
-
+      // If middle join Chow tiles exist in hand, enable Chow button
       if (playerTurn === turn && middleJoinChow.length === 2) {
         disableChowButton = false;
         chowBgColor = "lightcoral";
       }
 
+      // Find 2 similar tiles in hand (Pung)
       pung = player.main.filter(tile => {
         return tile.code.includes(prefix + tileIndex)
       });
-
       if (pung.length === 2) {
         disablePungButton = false;
         pungBgColor = "red";
@@ -621,10 +573,10 @@ class App extends Component {
         disablePungButton = true;
       }
 
+      // Find 3 similar tiles in hand (Kong)
       kong = player.main.filter(tile => {
         return tile.code.includes(prefix + tileIndex)
       });
-
       if (kong.length === 3) {
         disableKongButton = false;
         kongBgColor = "red";
@@ -646,6 +598,14 @@ class App extends Component {
 
 
 
+
+    if (playerTurn === turn) {
+      disableDrawTileBtn = hasDrawnTile;
+      player.main.sort(sortArray);
+    } else {
+      disableDiscardButton = true;
+      disableDrawTileBtn = true;
+    }
 
     // Prevent pung/kong after current player decided to draw a tile
     if (playerTurn === turn) {
