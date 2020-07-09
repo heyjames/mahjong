@@ -11,20 +11,27 @@ import testState from './testState4.json';
 // import _ from 'lodash';
 
 class App extends Component {
-  state = {
-    tiles: [],
-    player1: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-    player2: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-    player3: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-    player4: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
-    discardPile: { main: [], recentDiscard: {} },
-    turn: 0,
-    messages: [],
-    hasDrawnTile: true,
-    disableDiscardButton: true,
-    disableChowButton: true,
-    disablePungButton: true,
-    disableKongButton: true
+  constructor(props) {
+    super(props);
+
+    // this.state = {
+    //   tiles: [],
+    //   player1: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+    //   player2: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+    //   player3: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+    //   player4: { main: [], newTile: {}, flowers: [], chowPungKong: [] },
+    //   discardPile: { main: [], recentDiscard: {} },
+    //   turn: 0,
+    //   messages: [],
+    //   hasDrawnTile: true,
+    //   disableDiscardButton: true,
+    //   disableChowButton: true,
+    //   disablePungButton: true,
+    //   disableKongButton: true
+    // }
+
+    // Use a saved state to allow pung, chow testing.
+    this.state = testState;
   }
 
   // 144 tiles
@@ -211,13 +218,13 @@ class App extends Component {
   ];
 
   async componentDidMount() {
-    await this.setNewGame();
+    // await this.setNewGame();
 
     // this.givePlayersTiles();
-    this.setState(testState);
-    this.sortAllHands();
+    // this.setState(testState);
+    // this.sortAllHands();
 
-    this.tileCountVerification();
+    // this.tileCountVerification();
   }
 
   sortAllHands = () => {
