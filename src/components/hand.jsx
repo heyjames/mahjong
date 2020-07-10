@@ -1,32 +1,38 @@
 import React from 'react';
 import Button from './button';
 import _ from 'lodash';
+import ExposedTileSets from './exposedTileSets';
+import ChowButton from './chowButton';
+import PlayerControls from './playerControls';
 
 const Hand = ({
-  player,
-  playerTurn,
   discardTile,
-  playerNum,
-  bgColor = "lightblue",
-  turn,
   handleDrawTile,
-  hasDrawnTile,
-  disableDiscardButton,
-  disablePungButton,
-  disableChowButton,
-  discardPile,
-  disableKongButton,
   handleExposeTileSet,
-  disableDrawTileBtn,
-  pung,
-  pungBgColor,
-  kong,
-  kongBgColor,
-  rightJoinChow,
-  chowBgColor,
-  leftJoinChow,
-  middleJoinChow
+  data
 }) => {
+  let {
+    player,
+    playerNum,
+    turn,
+    playerTurn,
+    disableDiscardButton,
+    disableChowButton,
+    disablePungButton,
+    disableKongButton,
+    disableDrawTileBtn,
+    pungBgColor,
+    kongBgColor,
+    chowBgColor,
+    pung,
+    kong,
+    rightJoinChow,
+    leftJoinChow,
+    middleJoinChow,
+    bgColor = "purple",
+  } = data;
+
+  // console.log(data);
 
   let styleChowPungKongTiles = {
     backgroundColor: "white",
@@ -43,27 +49,17 @@ const Hand = ({
       <div style={{ paddingBottom: "16px" }}>
         {playerNum}
         <div>
-          <Button
-            name="drawTile"
-            label="Draw Tile"
-            onClick={handleDrawTile}
-            disabled={disableDrawTileBtn}
-          />
-
-          <Button
-            name="pung"
-            label="Pung"
-            onClick={() => handleExposeTileSet(playerTurn, pung)}
-            disabled={disablePungButton}
-            css={{ backgroundColor: pungBgColor }}
-          />
-
-          <Button
-            name="kong"
-            label="Kong"
-            onClick={() => handleExposeTileSet(playerTurn, kong)}
-            disabled={disableKongButton}
-            css={{ backgroundColor: kongBgColor }}
+          <PlayerControls
+            handleDrawTile={handleDrawTile}
+            disableDrawTileBtn={disableDrawTileBtn}
+            handleExposeTileSet={handleExposeTileSet}
+            playerTurn={playerTurn}
+            pungBgColor={pungBgColor}
+            pung={pung}
+            kong={kong}
+            disablePungButton={disablePungButton}
+            disableKongButton={disableKongButton}
+            kongBgColor={kongBgColor}
           />
         </div>
 
@@ -81,54 +77,48 @@ const Hand = ({
               disabled={disableDiscardButton}
               css={{ backgroundColor: bgColor, marginBottom: "2px", width: "130px" }}
             />
-            {(rightJoinChow.length === 2)
-              && (tile.code === rightJoinChow[0].code || tile.code === rightJoinChow[1].code)
-              && <Button
-                name="r-chow"
-                label="R-C"
-                onClick={() => handleExposeTileSet(playerTurn, rightJoinChow)}
-                disabled={disableChowButton}
-                css={{ backgroundColor: chowBgColor }}
-              />
-            }
-            {(leftJoinChow.length === 2)
-              && (tile.code === leftJoinChow[0].code || tile.code === leftJoinChow[1].code)
-              && <Button
-                name="l-chow"
-                label="L-C"
-                onClick={() => handleExposeTileSet(playerTurn, leftJoinChow)}
-                disabled={disableChowButton}
-                css={{ backgroundColor: chowBgColor }}
-              />
-            }
-            {(middleJoinChow.length === 2)
-              && (tile.code === middleJoinChow[0].code || tile.code === middleJoinChow[1].code)
-              && <Button
-                name="m-chow"
-                label="M-C"
-                css={{ backgroundColor: chowBgColor }}
-                onClick={() => handleExposeTileSet(playerTurn, middleJoinChow)}
-                disabled={disableChowButton}
-              />
-            }
+            <ChowButton
+              label="R-C"
+              name="r-chow"
+              chowArray={rightJoinChow}
+              playerTurn={playerTurn}
+              turn={turn}
+              tile={tile}
+              disableChowButton={disableChowButton}
+              chowBgColor={chowBgColor}
+              handleExposeTileSet={handleExposeTileSet}
+            />
+            <ChowButton
+              label="L-C"
+              name="l-chow"
+              chowArray={leftJoinChow}
+              playerTurn={playerTurn}
+              turn={turn}
+              tile={tile}
+              disableChowButton={disableChowButton}
+              chowBgColor={chowBgColor}
+              handleExposeTileSet={handleExposeTileSet}
+            />
+            <ChowButton
+              label="M-C"
+              name="m-chow"
+              chowArray={middleJoinChow}
+              playerTurn={playerTurn}
+              turn={turn}
+              tile={tile}
+              disableChowButton={disableChowButton}
+              chowBgColor={chowBgColor}
+              handleExposeTileSet={handleExposeTileSet}
+            />
           </React.Fragment>
         )
       })}
 
-      {player.chowPungKong.length >= 3
-        && <div style={{ paddingTop: "20px" }}>
-          {player.chowPungKong.map((tile, index) => {
-            return (
-              <Button
-                key={index}
-                name={playerNum + "_" + tile.code}
-                label={tile.label}
-                css={styleChowPungKongTiles}
-                disabled={true}
-              />
-            )
-          })}
-        </div>}
+      <ExposedTileSets
+        player={player}
+        playerNum={playerNum}
+        styleChowPungKongTiles={styleChowPungKongTiles}
+      />
 
     </div>
   );
