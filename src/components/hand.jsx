@@ -4,6 +4,7 @@ import _ from 'lodash';
 import ExposedTileSets from './exposedTileSets';
 import ChowButton from './chowButton';
 import PlayerControls from './playerControls';
+import Flowers from './flowers';
 
 const Hand = ({
   discardTile,
@@ -67,7 +68,11 @@ const Hand = ({
       </div>
       {player.main.map((tile, index) => {
         bgColor = (tile.code === player.newTile.code) ? "lightseagreen" : "lightblue";
-
+        if (tile.code === player.newTile.code) {
+          // console.log(player.newTile);
+          console.log(bgColor);
+        }
+        
         return (
           <React.Fragment key={index}>
             <Button
@@ -115,6 +120,12 @@ const Hand = ({
       })}
 
       <ExposedTileSets
+        player={player}
+        playerNum={playerNum}
+        styleChowPungKongTiles={styleChowPungKongTiles}
+      />
+
+      <Flowers
         player={player}
         playerNum={playerNum}
         styleChowPungKongTiles={styleChowPungKongTiles}
