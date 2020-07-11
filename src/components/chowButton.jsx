@@ -4,6 +4,7 @@ import Button from './button';
 const ChowButton = ({
   chowArray,
   playerTurn,
+  hasDrawnTile,
   turn,
   tile,
   label,
@@ -15,6 +16,7 @@ const ChowButton = ({
   return (
     <React.Fragment>
       {(chowArray.length === 2)
+        && (hasDrawnTile === false)
         && (playerTurn === turn)
         && (tile.code === chowArray[0].code || tile.code === chowArray[1].code)
         && <Button

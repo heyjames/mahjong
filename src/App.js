@@ -403,6 +403,7 @@ class App extends Component {
     handState.playerNum = playerNum;
     handState.turn = turn;
     handState.playerTurn = parseInt(playerNum.slice(-1));
+    handState.hasDrawnTile = hasDrawnTile;
     handState.disableDiscardButton = disableDiscardButton;
     handState.disableChowButton = disableChowButton;
     handState.disablePungButton = disablePungButton;

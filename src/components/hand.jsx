@@ -18,6 +18,7 @@ const Hand = ({
     turn,
     playerTurn,
     disableDiscardButton,
+    hasDrawnTile,
     disableChowButton,
     disablePungButton,
     disableKongButton,
@@ -87,6 +88,7 @@ const Hand = ({
               name="r-chow"
               chowArray={rightJoinChow}
               playerTurn={playerTurn}
+              hasDrawnTile={hasDrawnTile}
               turn={turn}
               tile={tile}
               disableChowButton={disableChowButton}
@@ -98,6 +100,7 @@ const Hand = ({
               name="l-chow"
               chowArray={leftJoinChow}
               playerTurn={playerTurn}
+              hasDrawnTile={hasDrawnTile}
               turn={turn}
               tile={tile}
               disableChowButton={disableChowButton}
@@ -109,6 +112,7 @@ const Hand = ({
               name="m-chow"
               chowArray={middleJoinChow}
               playerTurn={playerTurn}
+              hasDrawnTile={hasDrawnTile}
               turn={turn}
               tile={tile}
               disableChowButton={disableChowButton}
