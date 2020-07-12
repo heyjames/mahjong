@@ -207,46 +207,34 @@ class App extends Component {
     hasDrawnTile = true;
 
     // Remove and assign tile from wall to variable
-    // let grabbedTile = (wallSide === "tail") ? tiles.pop() : tiles.shift();
-    let grabbedTile = null;
-
-    if (wallSide === "tail") {
-      // Flower grab on the right side
-      grabbedTile = tiles.pop();
-    } else {
-      // Normal tile grab from left side
-      grabbedTile = tiles.shift();
-    }
     
     let disableDiscardButton = false;
     let disablePungButton = true;
     
     let currentPlayer = "player" + this.state.turn;
     let currentPlayerHand = { ...this.state[currentPlayer] };
+    let grabbedTile = {};
+    if (currentPlayerHand.newTile.code && (currentPlayerHand.newTile.code.substring(0, 3) === "flo")) {
+      grabbedTile = tiles.pop(); // Flower (right)
+    } else {
+      grabbedTile = tiles.shift();
+    }
+    
     const grabbedTilePrefix = grabbedTile.code.substring(0, 3); // flo
 
     // Place tile in player's appropriate section of hand
     if (grabbedTilePrefix === "flo") {
       currentPlayerHand.flowers.push(grabbedTile);
-      
-      this.setState({
-        tiles,
-        [currentPlayer]: currentPlayerHand,
-        hasDrawnTile,
-        disableDiscardButton,
-        disablePungButton
-      }, () => {
-        this.handleDrawTile("tail");
-      });
+      currentPlayerHand.newTile = { ...grabbedTile };
+      hasDrawnTile = false;
+      disableDiscardButton = true;
     } else {
       // Set the player's latest tile
-      currentPlayerHand.newTile = grabbedTile;
+      currentPlayerHand.newTile = { ...grabbedTile };
+      console.log("Nooo");
       currentPlayerHand.main.push(grabbedTile);
     }
-
-    // let disableDiscardButton = false;
-    // let disablePungButton = true;
-
+    
     this.setState({
       tiles,
       [currentPlayer]: currentPlayerHand,
@@ -300,9 +288,9 @@ class App extends Component {
     });
 
     // Empty newTile if discarding it
-    if (player.newTile.code === discardingTile.code) {
+    // if (player.newTile.code === discardingTile.code) {
       player.newTile = {};
-    }
+    // }
 
     discardPile.recentDiscard.prevOwner = "player" + turn;
 

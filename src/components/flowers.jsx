@@ -7,6 +7,14 @@ const Flowers = ({player, playerNum, styleChowPungKongTiles}) => {
       {player.flowers.length > 0
         && <div style={{ paddingTop: "20px" }}>
           {player.flowers.map((tile, index) => {
+            if (tile.code === player.newTile.code) {
+              styleChowPungKongTiles.backgroundColor = "lightseagreen";
+              styleChowPungKongTiles.color = "white";
+            } else {
+              styleChowPungKongTiles.backgroundColor = "white";
+              styleChowPungKongTiles.color = "black";
+            }
+            
             return (
               <Button
                 key={index}

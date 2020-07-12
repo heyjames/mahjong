@@ -71,7 +71,7 @@ const Hand = ({
         bgColor = (tile.code === player.newTile.code) ? "lightseagreen" : "lightblue";
         if (tile.code === player.newTile.code) {
           // console.log(player.newTile);
-          console.log(bgColor);
+          // console.log(bgColor);
         }
         
         return (
