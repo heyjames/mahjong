@@ -359,14 +359,14 @@ class App extends Component {
     handState.rightJoinChow = [];
     handState.leftJoinChow = [];
     handState.middleJoinChow = [];
-    let pungKongObj = new  PungKong;
+    let pungKongObj = new PungKong();
 
     // If the discard pile has a tile, handle Chow/Pung/Kong if available
     if (recentDiscardCode) {
       // Split last discard code into tile type and index number
       handState.tileIndex = recentDiscardCode.charAt(3); // 2
       handState.prefix = recentDiscardCode.substring(0, 3); // bar
-      let chowObj = new Chow;
+      let chowObj = new Chow();
       
       handState = chowObj.handleRightJoinChow(handState);
       handState = chowObj.handleLeftJoinChow(handState);
