@@ -178,60 +178,33 @@ class App extends Component {
     this.setState({ messages });
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  handleDrawTile = (wallSide=null) => {
-    let tiles = [...this.state.tiles];
-    let hasDrawnTile = this.state.hasDrawnTile;
+  handleDrawTile = () => {
+    const tiles = [ ...this.state.tiles ];
+    let { hasDrawnTile, disableDiscardButton, disablePungButton } = this.state;
 
     hasDrawnTile = true;
+    disableDiscardButton = false;
+    disablePungButton = true;
+    
+    const currentPlayer = "player" + this.state.turn;
+    const currentPlayerHand = { ...this.state[currentPlayer] };
 
-    // Remove and assign tile from wall to variable
-    
-    let disableDiscardButton = false;
-    let disablePungButton = true;
-    
-    let currentPlayer = "player" + this.state.turn;
-    let currentPlayerHand = { ...this.state[currentPlayer] };
-    let grabbedTile = {};
-    if (currentPlayerHand.newTile.code && (currentPlayerHand.newTile.code.substring(0, 3) === "flo")) {
-      grabbedTile = tiles.pop(); // Flower (right)
-    } else {
-      grabbedTile = tiles.shift();
-    }
-    
-    const grabbedTilePrefix = grabbedTile.code.substring(0, 3); // flo
+    // Grab a tile from the other side of the wall if it's a flower
+    const grabbedTile = ((currentPlayerHand.newTile.code) 
+                    && (currentPlayerHand.newTile.code.substring(0, 3)
+                    === "flo"))
+                ? tiles.pop()
+                : tiles.shift();
 
-    // Place tile in player's appropriate section of hand
-    if (grabbedTilePrefix === "flo") {
+    // Place the tile in appropriate section of the player's hand
+    if (grabbedTile.code.substring(0, 3) === "flo") {
       currentPlayerHand.flowers.push(grabbedTile);
       currentPlayerHand.newTile = { ...grabbedTile };
+
       hasDrawnTile = false;
       disableDiscardButton = true;
     } else {
-      // Set the player's latest tile
       currentPlayerHand.newTile = { ...grabbedTile };
-      console.log("Nooo");
       currentPlayerHand.main.push(grabbedTile);
     }
     
@@ -243,25 +216,6 @@ class App extends Component {
       disablePungButton
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   handleClearMessages = () => {
     this.setState({ messages: ["Messages cleared."] });
@@ -436,7 +390,7 @@ class App extends Component {
     return (
       <Hand
         discardTile={this.discardTile}
-        handleDrawTile={() => this.handleDrawTile()}
+        handleDrawTile={this.handleDrawTile}
         handleExposeTileSet={this.handleExposeTileSet}
         data={handState}
       />
