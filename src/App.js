@@ -16,6 +16,7 @@ import tiles from './utils/tiles';
 import testState from './testState6_flower.json';
 // import testState from './testState7_bug.json';
 import _ from 'lodash';
+import Win from './utils/Win';
 
 class App extends Component {
   constructor(props) {
@@ -179,6 +180,14 @@ class App extends Component {
     this.setState({ messages });
   }
 
+  checkWin = (currentPlayer) => {
+    const currentPlayerHand = this.state[currentPlayer];
+    let win = new Win();
+    const result = win.hasOnePairOfEyes(currentPlayerHand.main);
+    console.log(`Has one pair of eyes: ${result}`);
+    // console.log("You won!");
+  }
+
   handleDrawTile = () => {
     const tiles = [ ...this.state.tiles ];
     let { hasDrawnTile, disableDiscardButton, disablePungButton } = this.state;
@@ -189,6 +198,8 @@ class App extends Component {
     
     const currentPlayer = "player" + this.state.turn;
     const currentPlayerHand = { ...this.state[currentPlayer] };
+
+    this.checkWin(currentPlayer);
 
     // Grab a tile from the other side of the wall if it's a flower
     const grabbedTile = ((currentPlayerHand.newTile.code) 
@@ -405,7 +416,7 @@ class App extends Component {
       messages
     } = this.state;
 
-    console.log(this.state);
+    // console.log(this.state);
 
     return (
       <React.Fragment>

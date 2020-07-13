@@ -19,4 +19,45 @@ const shuffleArray = (array) => {
   return array;
 }
 
-export { sortArray, shuffleArray };
+const getSubstring = (str, start, end) => {
+  return str.substring(start, end);
+}
+
+const createUniqueCounterTable = (arr, property, callback=null) => {
+  const table = {};
+
+  for (let i=0; i<arr.length; i++) {
+    let key = arr[i][property];
+    if (callback !== null) key = callback(key);
+
+    if (table.hasOwnProperty(key)) {
+      table[key] = table[key] + 1;
+    } else {
+      table[key] = 1;
+    }
+  }
+
+  return table;
+}
+
+const pushSpecifiedCountsToArray = (table, desiredCount) => {
+  const arr = [];
+
+  for (let j=0; j<Object.keys(table).length; j++) {
+    if (table[Object.keys(table)[j]] === desiredCount) {
+      arr.push(Object.keys(table)[j]);
+    }
+  }
+
+  return arr;
+}
+
+
+
+export {
+  sortArray,
+  shuffleArray,
+  createUniqueCounterTable,
+  pushSpecifiedCountsToArray,
+  getSubstring
+};

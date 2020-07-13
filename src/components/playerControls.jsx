@@ -35,6 +35,13 @@ const PlayerControls = ({
         disabled={disableKongButton}
         css={{ backgroundColor: kongBgColor }}
       />
+      <Button
+        name="win"
+        label="Win"
+        onClick={() => console.log("Win button pressed.")}
+        disabled={false}
+        css={{ backgroundColor: kongBgColor }}
+      />
     </React.Fragment>
   );
 }
