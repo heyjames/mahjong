@@ -132,7 +132,6 @@ const Hand = ({
       <Flowers
         player={player}
         playerNum={playerNum}
-        styleChowPungKongTiles={styleChowPungKongTiles}
       />
 
     </div>

@@ -1,26 +1,32 @@
 import React from 'react';
 import Button from './button';
 
-const Flowers = ({player, playerNum, styleChowPungKongTiles}) => {
+const Flowers = ({player, playerNum}) => {
+  let styleFlowerTiles = {
+    backgroundColor: "white",
+    marginBottom: "2px",
+    width: "130px"
+  };
+  
   return (
     <React.Fragment>
       {player.flowers.length > 0
         && <div style={{ paddingTop: "20px" }}>
           {player.flowers.map((tile, index) => {
             if (tile.code === player.newTile.code) {
-              styleChowPungKongTiles.backgroundColor = "lightseagreen";
-              styleChowPungKongTiles.color = "white";
+              styleFlowerTiles.backgroundColor = "lightseagreen";
+              styleFlowerTiles.color = "white";
             } else {
-              styleChowPungKongTiles.backgroundColor = "white";
-              styleChowPungKongTiles.color = "black";
+              styleFlowerTiles.backgroundColor = "white";
+              styleFlowerTiles.color = "black";
             }
-            
+
             return (
               <Button
                 key={index}
                 name={playerNum + "_" + tile.code}
                 label={tile.label}
-                css={styleChowPungKongTiles}
+                css={styleFlowerTiles}
                 disabled={true}
               />
             )

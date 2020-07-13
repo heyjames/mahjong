@@ -14,6 +14,7 @@ import tiles from './utils/tiles';
 //import testState from './testState4.json';
 //import testState from './testState5_kong.json';
 import testState from './testState6_flower.json';
+// import testState from './testState7_bug.json';
 import _ from 'lodash';
 
 class App extends Component {
@@ -404,7 +405,7 @@ class App extends Component {
       messages
     } = this.state;
 
-    // console.log(this.state);
+    console.log(this.state);
 
     return (
       <React.Fragment>
