@@ -15,6 +15,7 @@ import tiles from './utils/tiles';
 //import testState from './testState5_kong.json';
 import testState from './testState6_flower.json';
 // import testState from './testState7_bug.json';
+// import testState from './testState8_eyes.json';
 import _ from 'lodash';
 import Win from './utils/Win';
 
@@ -182,9 +183,18 @@ class App extends Component {
 
   checkWin = (currentPlayer) => {
     const currentPlayerHand = this.state[currentPlayer];
-    let win = new Win();
-    const result = win.hasOnePairOfEyes(currentPlayerHand.main);
-    console.log(`Has one pair of eyes: ${result}`);
+    let win = new Win(currentPlayerHand.main);
+
+    win.hasOnePairOfEyes(); // this should return a boolean
+    // console.log(`Has one pair of eyes: ${resultEyes}`);
+
+    win.hasSelfObtainedPungs();
+    win.hasSelfObtainedKongs();
+
+    win.checkTripleSets();
+    win.mainHand.map(element => { console.log(element.label) });
+    // console.log(`Result Triples: ${resultTriples}`);
+
     // console.log("You won!");
   }
 
@@ -199,12 +209,10 @@ class App extends Component {
     const currentPlayer = "player" + this.state.turn;
     const currentPlayerHand = { ...this.state[currentPlayer] };
 
-    this.checkWin(currentPlayer);
-
     // Grab a tile from the other side of the wall if it's a flower
     const grabbedTile = ((currentPlayerHand.newTile.code) 
-                    && (currentPlayerHand.newTile.code.substring(0, 3)
-                    === "flo"))
+                      && (currentPlayerHand.newTile.code.substring(0, 3)
+                      === "flo"))
                 ? tiles.pop()
                 : tiles.shift();
 
@@ -219,6 +227,8 @@ class App extends Component {
       currentPlayerHand.newTile = { ...grabbedTile };
       currentPlayerHand.main.push(grabbedTile);
     }
+
+    this.checkWin(currentPlayer);
     
     this.setState({
       tiles,
@@ -312,6 +322,8 @@ class App extends Component {
 
     currentPlayer.chowPungKong.sort(sortArray);
 
+    this.checkWin("player" + this.state.turn);
+
     this.setState({
       [currentPlayer]: currentPlayer,
       discardPile,
@@ -352,6 +364,7 @@ class App extends Component {
     
     const recentDiscardCode = _.get(discardPile, "recentDiscard.code");
     
+    let pungKongObj = new PungKong();
     let handState = {};
     handState.player = this.state[playerNum];
     handState.playerNum = playerNum;
@@ -371,7 +384,6 @@ class App extends Component {
     handState.rightJoinChow = [];
     handState.leftJoinChow = [];
     handState.middleJoinChow = [];
-    let pungKongObj = new PungKong();
 
     // If the discard pile has a tile, handle Chow/Pung/Kong if available
     if (recentDiscardCode) {

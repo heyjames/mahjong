@@ -26,7 +26,7 @@ const getSubstring = (str, start, end) => {
 const createUniqueCounterTable = (arr, property, callback=null) => {
   const table = {};
 
-  for (let i=0; i<arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     let key = arr[i][property];
     if (callback !== null) key = callback(key);
 
@@ -43,7 +43,7 @@ const createUniqueCounterTable = (arr, property, callback=null) => {
 const pushSpecifiedCountsToArray = (table, desiredCount) => {
   const arr = [];
 
-  for (let j=0; j<Object.keys(table).length; j++) {
+  for (let j = 0; j < Object.keys(table).length; j++) {
     if (table[Object.keys(table)[j]] === desiredCount) {
       arr.push(Object.keys(table)[j]);
     }
@@ -52,12 +52,19 @@ const pushSpecifiedCountsToArray = (table, desiredCount) => {
   return arr;
 }
 
-
+const isEmptyObject = (obj) => {
+  if (Object.getOwnPropertyNames(obj).length === 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 export {
   sortArray,
   shuffleArray,
   createUniqueCounterTable,
   pushSpecifiedCountsToArray,
-  getSubstring
+  getSubstring,
+  isEmptyObject
 };
